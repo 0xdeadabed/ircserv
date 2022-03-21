@@ -1,0 +1,41 @@
+CFLAGS = -Wall -Wextra -Werror
+CC = g++
+
+SRC_DIR ?= ../src
+OBJ_DIR ?= ../build
+
+UNAME = $(shell uname -s)
+
+TEST_FLAGS ?=
+
+SRCS = $(shell find $(SRC_DIR) -name *.cpp)
+OBJS = $(SRCS:%=$(OBJ_DIR)/%.o)
+
+TESTS = $(shell find . -name *.cpp)
+BIN_DIR = ./bin
+TEST_BINS = $(patsubst ./%.cpp, $(BIN_DIR)/%, $(TESTS))
+ifeq ($(UNAME), Linux)
+	CRITERION_DIR = $(dir $(shell find criterion* -type f -name "libcriterion.so"))
+else
+	CRITERION_DIR = $(dir $(shell find criterion* -type f -name "libcriterion.dylib"))
+endif
+CRITERION_INC = $(shell find $(CRITERION_DIR:%/lib/=%) -type d -name include)
+
+all:	$(TEST_BINS)
+	@for test in $(TEST_BINS); do \
+		export "DYLD_LIBRARY_PATH=$(shell pwd)/$(CRITERION_DIR)" ; \
+		export "LD_LIBRARY_PATH=$(shell pwd)/$(CRITERION_DIR)" ; \
+		printf "[`tput setaf 1`test`tput sgr0`] running $$test\n" ; \
+		./$$test || true; \
+	done
+	@$(MAKE) clean
+
+$(BIN_DIR)/%: ./%.cpp
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) $< $(OBJS) -L$(CRITERION_DIR) -lcriterion -o $@ -I$(CRITERION_INC) $(TEST_FLAGS)
+
+clean:
+	@rm -rf $(BIN_DIR)
+	@printf "[`tput setaf 1`test`tput sgr0`] clean done\n"
+
+.PHONY: all clean
