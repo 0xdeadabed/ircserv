@@ -9,7 +9,7 @@
 #include <cstring>
 #include <arpa/inet.h>
 
-#define SERVER_PORT 4242
+#define SERVER_PORT 6667
 #define MAXLEN 1024
 
 int err(const std::string& str);
@@ -19,6 +19,8 @@ int main(int argc, char** argv){
 	struct sockaddr_in	server_address;
 	char				receive_buff[MAXLEN];
 
+	(void)argc;
+	(void)argv;
 	listen_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (listen_fd < 0)
 		return err("socket not created");

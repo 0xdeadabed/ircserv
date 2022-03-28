@@ -16,7 +16,7 @@ BIN_DIR := $(shell mkdir -p ./bin && printf "./bin")
 INC_DIR := $(shell mkdir -p ./include && printf "./include")
 BUILD_DIR ?= ./build
 
-NAME := ft_irc
+NAME := ircserv
 
 SRCS = $(shell find $(SRC_DIR) -name *.cpp)
 OBJS = $(SRCS:%=$(BUILD_DIR)/%.o)
