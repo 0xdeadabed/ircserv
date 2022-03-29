@@ -24,6 +24,7 @@ private:
 	socklen_t					_adrr_len;
 	std::string					nickname;
 	std::vector<std::string>	_channels;
+	std::string					_buffer;
 };
 
 std::iostream &operator<<(std::iostream &io, Client const & client);

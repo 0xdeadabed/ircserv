@@ -26,6 +26,7 @@ Client &Client::operator=(Client const &rhs)
 	_adrr_len = rhs._adrr_len;
 	nickname = rhs.nickname;
 	_channels = rhs._channels;
+	_buffer = rhs._buffer;
 }
 
 std::iostream &operator<<(std::iostream &io, Client const & client){
