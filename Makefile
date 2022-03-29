@@ -1,4 +1,4 @@
-CFLAGS := -Wall -Wextra -Werror -g3
+CFLAGS := -Wall -Wextra -Werror -g3 -std=c++98
 CC = c++
 MAKEFLAGS += --no-print-directory
 

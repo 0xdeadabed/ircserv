@@ -15,7 +15,7 @@ Server::Server(unsigned int port, std::string password):
 	listen_fd.events = POLLIN;
 	listen_fd.revents = 0;
 	if (listen_fd.fd < 0)
-		throw socketCreationException();
+		throw socketException();
 
 	bzero(&_server_address, sizeof(_server_address));
 	_server_address.sin_family = AF_INET;
@@ -23,9 +23,9 @@ Server::Server(unsigned int port, std::string password):
 	_server_address.sin_port = htons(_port);
 
 	if (bind(listen_fd.fd, (sockaddr *) &_server_address, sizeof(_server_address)) < 0)
-		throw socketBindException();
+		throw socketException();
 	if (listen(listen_fd.fd, 10) < 0)
-		throw socketListenException();
+		throw socketException();
 
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
@@ -51,9 +51,70 @@ Server &Server::operator=(Server const &rhs)
 	this->_watchlist = rhs._watchlist;
 	this->_clients = rhs._clients;
 	this->_channels = rhs._channels;
+	return *this;
 }
 
-std::iostream &operator<<(std::iostream &io, Server const & serv){
-	io << "server todo?";
-	return io;
+void Server::loop()
+{
+	int ready_fds = 0;
+	struct pollfd fd;
+
+	while (true) {
+		ready_fds = poll(&_watchlist[0], _watchlist.size(), 1000);
+		if (ready_fds < 0)
+			throw pollException();
+		for (int i = ready_fds; i > 0 ; i--)
+		{
+			fd = this->get_next_fd();
+			if (fd.fd == _watchlist[0].fd){
+				this->add_client();
+			}
+			else{
+				_clients[fd.fd].manage_events(fd.revents);
+			}
+			fd.revents = 0;
+		}
+		this->disconnect_timeouts();
+	}
+}
+
+void Server::add_client()
+{
+	try
+	{
+		Client new_client = Client((_watchlist[0]).fd);
+		struct pollfd new_watch;
+
+		new_watch.fd = new_client.get_fd();
+		new_watch.events = POLLIN | POLLOUT;
+		new_watch.revents = 0;
+		_clients.insert(std::pair<int, Client>(new_client.get_fd(), new_client));
+		_watchlist.push_back(new_watch);
+	}
+	catch (std::exception &e)
+	{
+		std::cout << "Error: " << e.what() << std::endl;
+	}
+}
+
+struct pollfd Server::get_next_fd()
+{
+	for (int i = 0; i < (int)_watchlist.size(); ++i)
+	{
+		if (_watchlist[i].revents | 0){
+			return _watchlist[i];
+		}
+	}
+	throw pollException();
+}
+
+void Server::disconnect_timeouts()
+{
+//	std::time_t timestamp = std::time(nullptr);
+//
+//	for( std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it )
+//	{
+//		//todo remove if timestamp to old
+////		if(it->second._time)
+//	}
 }

@@ -25,11 +25,12 @@ public:
 	Server(Server const &inst);
 	~Server();
 
-class socketCreationException: public std::exception {};
-class socketBindException: public std::exception {};
-class socketListenException: public std::exception {};
+class socketException: public std::exception {};
+class pollException: public std::exception {};
 
 	Server &operator=(Server const &rhs);
+
+	void	loop();
 
 private:
 	unsigned int				_port;
@@ -38,8 +39,10 @@ private:
 	std::vector<struct pollfd>	_watchlist;
 	std::map<int, Client>		_clients;
 	std::vector<Channel>		_channels;
-};
 
-std::iostream &operator<<(std::iostream &io, Server const & serv);
+	void			add_client();
+	struct pollfd	get_next_fd();
+	void			disconnect_timeouts();
+};
 
 #endif //FT_IRC_SERVER_HPP
