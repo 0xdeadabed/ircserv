@@ -40,7 +40,7 @@ Server::Server(Server const &inst)
 
 Server::~Server()
 {
-
+//todo
 }
 
 Server &Server::operator=(Server const &rhs)

@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include <netinet/in.h>
 
 class Client
 {
@@ -19,6 +20,8 @@ public:
 
 private:
 	int							_fd;
+	struct sockaddr_in			_addr;
+	socklen_t					_adrr_len;
 	std::string					nickname;
 	std::vector<std::string>	_channels;
 };

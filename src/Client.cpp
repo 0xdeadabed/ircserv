@@ -21,7 +21,11 @@ Client::~Client()
 
 Client &Client::operator=(Client const &rhs)
 {
-	this.
+	_fd = rhs._fd;
+	_addr = rhs._addr;
+	_adrr_len = rhs._adrr_len;
+	nickname = rhs.nickname;
+	_channels = rhs._channels;
 }
 
 std::iostream &operator<<(std::iostream &io, Client const & client){
