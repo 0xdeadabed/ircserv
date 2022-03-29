@@ -117,3 +117,7 @@ Temporary Items
 ircserv
 *.o
 *.a
+
+# Additional
+bin
+build
