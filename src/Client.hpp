@@ -9,6 +9,8 @@
 #include <vector>
 #include <netinet/in.h>
 
+#define READ_LEN 1024
+
 class Client
 {
 public:
@@ -33,6 +35,11 @@ private:
 	std::vector<std::string>	_channels;
 	std::string					_buffer;
 	std::time_t					_last_activity;
+	std::vector<std::string>	_queue;
+
+	void	read_inp();
+	void	send_out();
+	void	check_buff();
 };
 
 #endif //IRCSERV_CLIENT_HPP

@@ -4,6 +4,7 @@
 
 #include <arpa/inet.h>
 #include <poll.h>
+#include <unistd.h>
 #include "Client.hpp"
 
 Client::Client(int listen_fd):
@@ -20,6 +21,7 @@ Client::Client(int listen_fd):
 	_channels = std::vector<std::string>();
 	_buffer = std::string();
 	_last_activity = std::time(nullptr);
+	_queue = std::vector<std::string>();
 }
 
 Client::Client(Client const &inst)
@@ -43,6 +45,7 @@ Client &Client::operator=(Client const &rhs)
 	_buffer = rhs._buffer;
 	_is_op = rhs._is_op;
 	_last_activity = rhs._last_activity;
+	_queue = rhs._queue;
 	return *this;
 }
 
@@ -53,8 +56,52 @@ int Client::get_fd() const
 
 void Client::manage_events(short revents)
 {
-	if (revents & POLLIN)
-		std::cout << "pollin\n";
-	if (revents & POLLOUT)
-		std::cout << "pollout\n";
+	if (revents & POLLIN){
+		Client::read_inp();
+		Client::check_buff();
+	}
+	if (revents & POLLOUT && !this->_queue.empty())
+		Client::send_out();
+}
+
+void Client::read_inp()
+{
+	char buffer[READ_LEN + 1];
+	int n;
+
+	bzero(buffer, READ_LEN + 1);
+	while((n = read(this->_fd, buffer, READ_LEN)) == READ_LEN){
+		buffer[n] = 0;
+		this->_buffer.append(buffer);
+	}
+	if (n < 0)
+		throw clientException();
+	buffer[n] = 0;
+	this->_buffer.append(buffer);
+}
+
+void Client::send_out()
+{
+	write(this->_fd, &(this->_queue[0][0]), this->_queue[0].size());
+	this->_queue.erase(this->_queue.begin());
+}
+
+void Client::check_buff()
+{
+	size_t pos;
+	std::string temp;
+	//todo change
+	if ((pos = _buffer.find("\n")) != std::string::npos){
+		if (pos == 0)
+			temp = "";
+		else
+			temp = _buffer.substr(0, pos);
+		_buffer.erase(0, pos + 1);
+		std::time_t stamp = std::time(nullptr);
+
+		std::string answer = "[";
+		answer.append(std::asctime(std::localtime(&stamp))).pop_back();
+		answer.append("] fd: " + std::to_string(_fd) + " received message:\n");
+		_queue.push_back(answer + temp + "\n--- --- --- --- --- ---\n");
+	}
 }

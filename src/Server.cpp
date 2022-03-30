@@ -3,6 +3,7 @@
 //
 
 #include <sys/socket.h>
+#include <unistd.h>
 #include "Server.hpp"
 
 Server::Server(unsigned int port, std::string password):
@@ -57,7 +58,7 @@ Server &Server::operator=(Server const &rhs)
 void Server::loop()
 {
 	int ready_fds = 0;
-	struct pollfd fd;
+	int				ind;
 
 	while (true) {
 		ready_fds = poll(&_watchlist[0], _watchlist.size(), 1000);
@@ -65,16 +66,17 @@ void Server::loop()
 			throw pollException();
 		for (int i = ready_fds; i > 0 ; i--)
 		{
-			fd = this->get_next_fd();
-			if (fd.fd == _watchlist[0].fd){
+			ind = this->get_next_fd();
+			if (_watchlist[ind].fd == _watchlist[0].fd){
 				this->add_client();
 			}
 			else{
-				_clients[fd.fd].manage_events(fd.revents);
+				_clients[_watchlist[ind].fd].manage_events(_watchlist[ind].revents);
 			}
-			fd.revents = 0;
+			_watchlist[ind].revents = 0;
 		}
 		this->disconnect_timeouts();
+		sleep(1);
 	}
 }
 
@@ -97,12 +99,12 @@ void Server::add_client()
 	}
 }
 
-struct pollfd Server::get_next_fd()
+int Server::get_next_fd()
 {
 	for (int i = 0; i < (int)_watchlist.size(); ++i)
 	{
-		if (_watchlist[i].revents | 0){
-			return _watchlist[i];
+		if (_watchlist[i].revents){
+			return i;
 		}
 	}
 	throw pollException();

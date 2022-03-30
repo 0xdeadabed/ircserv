@@ -41,7 +41,7 @@ private:
 	std::vector<Channel>		_channels;
 
 	void			add_client();
-	struct pollfd	get_next_fd();
+	int 			get_next_fd();
 	void			disconnect_timeouts();
 };
 
