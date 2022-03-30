@@ -40,6 +40,7 @@ private:
 	void	read_inp();
 	void	send_out();
 	void	check_buff();
+	void	exec_cmd(std::string cmd);
 };
 
 #endif //IRCSERV_CLIENT_HPP

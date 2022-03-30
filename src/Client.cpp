@@ -97,11 +97,16 @@ void Client::check_buff()
 		else
 			temp = _buffer.substr(0, pos);
 		_buffer.erase(0, pos + 1);
-		std::time_t stamp = std::time(nullptr);
-
-		std::string answer = "[";
-		answer.append(std::asctime(std::localtime(&stamp))).pop_back();
-		answer.append("] fd: " + std::to_string(_fd) + " received message:\n");
-		_queue.push_back(answer + temp + "\n--- --- --- --- --- ---\n");
+		this->exec_cmd(temp);
 	}
+}
+
+void Client::exec_cmd(std::string cmd)
+{
+	std::time_t stamp = std::time(nullptr);
+	std::string answer = "[";
+
+	answer.append(std::asctime(std::localtime(&stamp))).pop_back();
+	answer.append("] fd: " + std::to_string(_fd) + " received message:\n");
+	_queue.push_back(answer + cmd + "\n--------\n");
 }
