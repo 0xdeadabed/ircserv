@@ -16,17 +16,20 @@ Server::Server(unsigned int port, std::string password):
 	listen_fd.events = POLLIN;
 	listen_fd.revents = 0;
 	if (listen_fd.fd < 0)
-		throw socketException();
-
-	bzero(&_server_address, sizeof(_server_address));
+		std::cout << "listen fd error" << std::endl;
+		//throw socketException();
+	//bzero(&_server_address, sizeof(_server_address));
+	memset(&_server_address, '\0', sizeof(_server_address));
 	_server_address.sin_family = AF_INET;
 	_server_address.sin_addr.s_addr = htonl(INADDR_ANY);
 	_server_address.sin_port = htons(_port);
 
 	if (bind(listen_fd.fd, (sockaddr *) &_server_address, sizeof(_server_address)) < 0)
-		throw socketException();
+		std::cout << "bind error caught" << std::endl;
+		//throw socketException();
 	if (listen(listen_fd.fd, 10) < 0)
-		throw socketException();
+		std::cout << "listen error caught" << std::endl;
+		//throw socketException();
 
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
