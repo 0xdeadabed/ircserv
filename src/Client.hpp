@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <netinet/in.h>
+#include <ctime>
 
 #define READ_LEN 1024
 

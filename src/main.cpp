@@ -38,7 +38,7 @@
 //
 //	while (true) {
 //		struct sockaddr_in	addr;
-//		socklen_t			adrr_len;\
+//		socklen_t			adrr_len;
 //		char				client_addr[MAXLEN + 1];
 //
 //		connect_fd = accept(listen_fd, (sockaddr *) &addr, &adrr_len);

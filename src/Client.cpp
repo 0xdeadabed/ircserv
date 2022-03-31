@@ -5,6 +5,9 @@
 #include <arpa/inet.h>
 #include <poll.h>
 #include <unistd.h>
+#include <cstring>
+#include <string>
+#include <sstream>
 #include "Client.hpp"
 
 Client::Client(int listen_fd):
@@ -20,7 +23,7 @@ Client::Client(int listen_fd):
 	ip_address = ip;
 	_channels = std::vector<std::string>();
 	_buffer = std::string();
-	_last_activity = std::time(nullptr);
+	_last_activity = std::time(NULL);
 	_queue = std::vector<std::string>();
 }
 
@@ -69,7 +72,8 @@ void Client::read_inp()
 	char buffer[READ_LEN + 1];
 	int n;
 
-	bzero(buffer, READ_LEN + 1);
+	//bzero(buffer, READ_LEN + 1);
+	memset(buffer, '\0', READ_LEN + 1);
 	while((n = read(this->_fd, buffer, READ_LEN)) == READ_LEN){
 		buffer[n] = 0;
 		this->_buffer.append(buffer);
@@ -103,10 +107,12 @@ void Client::check_buff()
 
 void Client::exec_cmd(std::string cmd)
 {
-	std::time_t stamp = std::time(nullptr);
+	std::time_t stamp = std::time(NULL);
 	std::string answer = "[";
 
-	answer.append(std::asctime(std::localtime(&stamp))).pop_back();
-	answer.append("] fd: " + std::to_string(_fd) + " received message:\n");
+	answer.append(std::asctime(std::localtime(&stamp))); //.pop_back(); pop_back is c++11 feature
+	std::ostringstream	convert;	//Stream used for the conversion -> c++98
+	convert << _fd;
+	answer.append("] fd: " + convert.str() + " received message:\n");
 	_queue.push_back(answer + cmd + "\n--------\n");
 }

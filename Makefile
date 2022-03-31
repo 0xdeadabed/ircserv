@@ -1,5 +1,5 @@
 CFLAGS := -Wall -Wextra -Werror -g3 -std=c++98 -pedantic
-CC = c++
+CC = g++
 MAKEFLAGS += --no-print-directory
 
 #UNAME = $(shell uname -s)

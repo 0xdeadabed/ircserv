@@ -4,6 +4,7 @@
 
 #include <sys/socket.h>
 #include <unistd.h>
+#include <cstring>
 #include "Server.hpp"
 
 Server::Server(unsigned int port, std::string password):
