@@ -108,11 +108,13 @@ void Client::check_buff()
 void Client::exec_cmd(std::string cmd)
 {
 	std::time_t stamp = std::time(NULL);
-	std::string answer = "[";
-
-	answer.append(std::asctime(std::localtime(&stamp))); //.pop_back(); pop_back is c++11 feature
 	std::ostringstream	convert;	//Stream used for the conversion -> c++98
 	convert << _fd;
+	std::string answer = "[";
+
+	//.pop_back(); pop_back is c++11 feature
+	answer.append(std::asctime(std::localtime(&stamp)));
+	answer = answer.substr(0, answer.size()-1);
 	answer.append("] fd: " + convert.str() + " received message:\n");
 	_queue.push_back(answer + cmd + "\n--------\n");
 }
