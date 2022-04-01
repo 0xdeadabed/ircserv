@@ -28,6 +28,8 @@ public:
 	Server(Server const &inst);
 	~Server();
 
+	void	connectClient(void);
+
 class socketException: public std::exception {};
 class pollException: public std::exception {};
 

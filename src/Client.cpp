@@ -26,6 +26,9 @@ Client::Client(int listen_fd)
 	_user = User();
 }
 
+Client::Client(int fd, const cpiterator &pollfd, const std::string &host, int port)
+	: _fd(fd), _port(port), _host(host), _pollfd(pollfd) { (void)_port; }
+
 //Client::Client(Client const &inst): host(inst.host)
 //{
 //	*this = inst;
@@ -71,7 +74,6 @@ void Client::read_inp()
 	char buffer[READ_LEN + 1];
 	int n;
 
-	//bzero(buffer, READ_LEN + 1);
 	memset(buffer, '\0', READ_LEN + 1);
 	while((n = read(this->_fd, buffer, READ_LEN)) == READ_LEN){
 		buffer[n] = 0;

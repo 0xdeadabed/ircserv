@@ -15,14 +15,19 @@
 
 #define READ_LEN 1024
 
+typedef	std::vector<pollfd>::iterator	cpiterator;
 class	Server;
 
 class Client
 {
 public:
 	Client(int listen_fd);
+	Client(int listen_fd, const cpiterator &pollfd, const std::string &host, int port);
 	//Client(Client const &inst);
 	~Client();
+
+
+	std::string getHost() const { return _host; };
 
 class clientException: public std::exception {};
 
@@ -33,6 +38,10 @@ class clientException: public std::exception {};
 
 private:
 	int							_fd;
+	int							_port;
+	std::string					_host;
+	cpiterator					_pollfd;
+	
 	struct sockaddr_in			_addr;
 	socklen_t					_adrr_len;
 	std::string					ip_address;
@@ -48,6 +57,7 @@ private:
 	void			manage_command(std::string cmd);
 	void			parse_cmd(std::string str, irc_cmd *cmd);
 	std::string		exec_cmd(const irc_cmd& cmd);
+
 };
 
 #endif //IRCSERV_CLIENT_HPP
