@@ -13,6 +13,7 @@
 
 #include "Channel.hpp"
 #include "Client.hpp"
+#include "irc_cmd.h"
 
 # ifndef IRC_SERV_PORT
 # 	define IRC_SERV_PORT 6697

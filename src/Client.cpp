@@ -9,10 +9,9 @@
 #include <string>
 #include <sstream>
 #include "Client.hpp"
+#include "Server.hpp"
 
-Client::Client(int listen_fd):
-	nickname("tbd"),
-	_is_op(false)
+Client::Client(int listen_fd)
 {
 	char	ip[INET_ADDRSTRLEN + 1];
 
@@ -21,10 +20,10 @@ Client::Client(int listen_fd):
 		throw clientException();
 	inet_ntop(AF_INET, &_addr, ip, INET_ADDRSTRLEN);
 	ip_address = ip;
-	_channels = std::vector<std::string>();
 	_buffer = std::string();
 	_last_activity = std::time(NULL);
 	_queue = std::vector<std::string>();
+	_user = User();
 }
 
 Client::Client(Client const &inst)
@@ -42,11 +41,9 @@ Client &Client::operator=(Client const &rhs)
 	_fd = rhs._fd;
 	_addr = rhs._addr;
 	_adrr_len = rhs._adrr_len;
-	nickname = rhs.nickname;
 	ip_address = rhs.ip_address;
-	_channels = rhs._channels;
+	_user = rhs._user;
 	_buffer = rhs._buffer;
-	_is_op = rhs._is_op;
 	_last_activity = rhs._last_activity;
 	_queue = rhs._queue;
 	return *this;
@@ -107,14 +104,56 @@ void Client::check_buff()
 
 void Client::exec_cmd(std::string cmd)
 {
-	std::time_t stamp = std::time(NULL);
+//	std::time_t stamp = std::time(NULL);
 	std::ostringstream	convert;	//Stream used for the conversion -> c++98
 	convert << _fd;
-	std::string answer = "[";
 
-	//.pop_back(); pop_back is c++11 feature
-	answer.append(std::asctime(std::localtime(&stamp)));
-	answer = answer.substr(0, answer.size()-1);
-	answer.append("] fd: " + convert.str() + " received message:\n");
-	_queue.push_back(answer + cmd + "\n--------\n");
+	std::string answer;
+//	std::string answer = "[";
+//	answer.append(std::asctime(std::localtime(&stamp)));
+//	answer = answer.substr(0, answer.size()-1);
+//	answer.append("] fd: " + convert.str() + " received message:\n");
+//	_queue.push_back(answer + cmd + "\n--------\n");
+
+	irc_cmd parsed_cmd;
+
+	parse_cmd(cmd, &parsed_cmd);
+	answer.append("origin: " + parsed_cmd.origin + "\nCMD: " + parsed_cmd.cmd + "\nargs:");
+	for (int i = 0; i < (int)parsed_cmd.args.size(); i++){
+		answer.append("\n" + parsed_cmd.args[i]);
+	}
+	answer.append("\n");
+	_queue.push_back(answer);
 }
+
+static void split(std::string str, std::vector<std::string> *args){
+	size_t next;
+
+	while((next = str.find(' ')) != std::string::npos){
+		args->push_back(str.substr(0, next));
+		str.erase(0, next + 1);
+	}
+}
+
+void	Client::parse_cmd(std::string str, irc_cmd *cmd){
+	std::string last_arg;
+
+	if (str[0] == ':') {
+		cmd->origin = str.substr(1, str.find(' ') - 1);
+		str.erase(0, str.find(' ') + 1);
+	}
+	else {
+		cmd->origin = ip_address;
+	}
+	cmd->cmd = str.substr(0, str.find(' '));
+	str.erase(0, str.find(' ') + 1);
+	if (str.find(':') != std::string::npos){
+		last_arg = str.substr(str.find(':') + 1);
+		str.erase(str.find(':'), std::string::npos);
+	}
+	split(str, &(cmd->args));
+	if (!last_arg.empty())
+		cmd->args.push_back(last_arg);
+}
+
+
