@@ -11,7 +11,7 @@
 #include "Client.hpp"
 #include "Server.hpp"
 
-Client::Client(int listen_fd, Server &host) : host(host)
+Client::Client(int listen_fd)
 {
 	char	ip[INET_ADDRSTRLEN + 1];
 
@@ -26,16 +26,17 @@ Client::Client(int listen_fd, Server &host) : host(host)
 	_user = User();
 }
 
-Client::Client(Client const &inst): host(inst.host)
-{
-	*this = inst;
-}
+//Client::Client(Client const &inst): host(inst.host)
+//{
+//	*this = inst;
+//}
 
 Client::~Client()
 {
 
 }
 
+/*
 Client &Client::operator=(Client const &rhs)
 {
 	_fd = rhs._fd;
@@ -48,7 +49,7 @@ Client &Client::operator=(Client const &rhs)
 	_queue = rhs._queue;
 	host = rhs.host;
 	return *this;
-}
+}*/
 
 int Client::get_fd() const
 {
@@ -155,4 +156,6 @@ std::string	Client::exec_cmd(const irc_cmd& cmd){
 
 		return ":ft_irc.com 200 :successfully disconnected";
 	}
+	return "Hi";
 }
+

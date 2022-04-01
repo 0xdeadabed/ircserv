@@ -15,16 +15,18 @@
 
 #define READ_LEN 1024
 
+class	Server;
+
 class Client
 {
 public:
-	Client(int listen_fd, Server &host);
-	Client(Client const &inst);
+	Client(int listen_fd);
+	//Client(Client const &inst);
 	~Client();
 
 class clientException: public std::exception {};
 
-	Client &operator=(Client const &rhs);
+	//Client &operator=(Client const &rhs);
 
 	int		get_fd() const;
 	void	manage_events(short revents);
@@ -38,7 +40,7 @@ private:
 	std::string					_buffer;
 	std::time_t					_last_activity;
 	std::vector<std::string>	_queue;
-	Server						&host;
+	//Server						&host;
 
 	void			read_inp();
 	void			send_out();

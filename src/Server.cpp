@@ -7,7 +7,7 @@
 #include <cstring>
 #include "Server.hpp"
 
-Server::Server(unsigned int port, std::string password):
+Server::Server(const std::string &port, const std::string &password):
 	_port(port),
 	_password(password)
 {
@@ -23,7 +23,7 @@ Server::Server(unsigned int port, std::string password):
 	memset(&_server_address, '\0', sizeof(_server_address));
 	_server_address.sin_family = AF_INET;
 	_server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-	_server_address.sin_port = htons(_port);
+	_server_address.sin_port = htons(std::stoi(_port));
 
 	if (bind(listen_fd.fd, (sockaddr *) &_server_address, sizeof(_server_address)) < 0)
 		std::cout << "bind error caught" << std::endl;
@@ -34,14 +34,15 @@ Server::Server(unsigned int port, std::string password):
 
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
-	_clients = std::map<int, Client>();
+	//_clients = std::map<int, Client>();
 	_channels = std::vector<Channel>();
 }
 
-Server::Server(Server const &inst)
+/*Server::Server(Server const &inst)
 {
 	*this = inst;
 }
+*/
 
 Server::~Server()
 {
@@ -50,7 +51,7 @@ Server::~Server()
 //todo
 }
 
-Server &Server::operator=(Server const &rhs)
+/*Server &Server::operator=(Server const &rhs)
 {
 	this->_port = rhs._port;
 	this->_password = rhs._password;
@@ -59,7 +60,7 @@ Server &Server::operator=(Server const &rhs)
 	this->_clients = rhs._clients;
 	this->_channels = rhs._channels;
 	return *this;
-}
+}*/
 
 bool run = true;
 
@@ -70,7 +71,6 @@ void	destroy(int n) {
 
 void Server::loop()
 {
-	int ready_fds = 0;
 	int				ind;
 
 
@@ -79,19 +79,18 @@ void Server::loop()
 	while (1) {
 		if (run == false)
 			break ;
-		ready_fds = poll(&_watchlist[0], _watchlist.size(), 1000);
-		if (ready_fds < 0)
-			std::cout << "Poll error: " << ready_fds << std::endl;
+		if (poll(_watchlist.begin().base(), _watchlist.size(), 1000) < 0)
+			throw	std::runtime_error("Error in poll");
 			//throw pollException();
-		for (int i = ready_fds; i > 0 ; i--)
+		for (piterator it = _watchlist.begin(); it != _watchlist.end() ; it++)
 		{
 			ind = this->get_next_fd();
 			if (_watchlist[ind].fd == _watchlist[0].fd){
 				this->add_client();
 			}
-			else{
-				_clients[_watchlist[ind].fd].manage_events(_watchlist[ind].revents);
-			}
+		//	else{
+		//		_clients[_watchlist[ind].fd].manage_events(_watchlist[ind].revents);
+		//	}
 			_watchlist[ind].revents = 0;
 		}
 		this->disconnect_timeouts();
@@ -99,17 +98,18 @@ void Server::loop()
 	}
 }
 
+
 void Server::add_client()
 {
 	try
 	{
-		Client new_client = Client((_watchlist[0]).fd, this);
+		Client new_client = Client((_watchlist[0]).fd);
 		struct pollfd new_watch;
 
 		new_watch.fd = new_client.get_fd();
 		new_watch.events = POLLIN | POLLOUT;
 		new_watch.revents = 0;
-		_clients.insert(std::pair<int, Client>(new_client.get_fd(), new_client));
+		//_clients.insert(std::pair<int, Client>(new_client.get_fd(), new_client));
 		_watchlist.push_back(new_watch);
 	}
 	catch (std::exception &e)
