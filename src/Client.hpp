@@ -11,13 +11,14 @@
 #include <ctime>
 #include "User.hpp"
 #include "irc_cmd.h"
+#include "Server.hpp"
 
 #define READ_LEN 1024
 
 class Client
 {
 public:
-	Client(int fd = -1);
+	Client(int listen_fd, Server &host);
 	Client(Client const &inst);
 	~Client();
 
@@ -37,12 +38,14 @@ private:
 	std::string					_buffer;
 	std::time_t					_last_activity;
 	std::vector<std::string>	_queue;
+	Server						&host;
 
 	void			read_inp();
 	void			send_out();
 	void			check_buff();
-	void			exec_cmd(std::string cmd);
+	void			manage_command(std::string cmd);
 	void			parse_cmd(std::string str, irc_cmd *cmd);
+	std::string		exec_cmd(const irc_cmd& cmd);
 };
 
 #endif //IRCSERV_CLIENT_HPP

@@ -11,7 +11,7 @@
 #include "Client.hpp"
 #include "Server.hpp"
 
-Client::Client(int listen_fd)
+Client::Client(int listen_fd, Server &host) : host(host)
 {
 	char	ip[INET_ADDRSTRLEN + 1];
 
@@ -26,7 +26,7 @@ Client::Client(int listen_fd)
 	_user = User();
 }
 
-Client::Client(Client const &inst)
+Client::Client(Client const &inst): host(inst.host)
 {
 	*this = inst;
 }
@@ -46,6 +46,7 @@ Client &Client::operator=(Client const &rhs)
 	_buffer = rhs._buffer;
 	_last_activity = rhs._last_activity;
 	_queue = rhs._queue;
+	host = rhs.host;
 	return *this;
 }
 
@@ -92,32 +93,24 @@ void Client::check_buff()
 	size_t pos;
 	std::string temp;
 	//todo change
-	if ((pos = _buffer.find("\n")) != std::string::npos){
+	if ((pos = _buffer.find('\n')) != std::string::npos){
 		if (pos == 0)
 			temp = "";
 		else
 			temp = _buffer.substr(0, pos);
 		_buffer.erase(0, pos + 1);
-		this->exec_cmd(temp);
+		this->manage_command(temp);
 	}
 }
 
-void Client::exec_cmd(std::string cmd)
+void Client::manage_command(std::string cmd)
 {
-//	std::time_t stamp = std::time(NULL);
-	std::ostringstream	convert;	//Stream used for the conversion -> c++98
-	convert << _fd;
-
 	std::string answer;
-//	std::string answer = "[";
-//	answer.append(std::asctime(std::localtime(&stamp)));
-//	answer = answer.substr(0, answer.size()-1);
-//	answer.append("] fd: " + convert.str() + " received message:\n");
-//	_queue.push_back(answer + cmd + "\n--------\n");
-
 	irc_cmd parsed_cmd;
 
-	parse_cmd(cmd, &parsed_cmd);
+	if (cmd.empty())
+		return;
+	this->parse_cmd(cmd, &parsed_cmd);
 	answer.append("origin: " + parsed_cmd.origin + "\nCMD: " + parsed_cmd.cmd + "\nargs:");
 	for (int i = 0; i < (int)parsed_cmd.args.size(); i++){
 		answer.append("\n" + parsed_cmd.args[i]);
@@ -156,4 +149,10 @@ void	Client::parse_cmd(std::string str, irc_cmd *cmd){
 		cmd->args.push_back(last_arg);
 }
 
+std::string	Client::exec_cmd(const irc_cmd& cmd){
+	if (cmd.cmd == "DISCONNECT"){
+//		host._clients.erase(this);
 
+		return ":ft_irc.com 200 :successfully disconnected";
+	}
+}

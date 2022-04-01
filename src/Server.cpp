@@ -103,7 +103,7 @@ void Server::add_client()
 {
 	try
 	{
-		Client new_client = Client((_watchlist[0]).fd);
+		Client new_client = Client((_watchlist[0]).fd, this);
 		struct pollfd new_watch;
 
 		new_watch.fd = new_client.get_fd();
