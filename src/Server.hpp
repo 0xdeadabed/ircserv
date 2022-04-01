@@ -33,6 +33,7 @@ class pollException: public std::exception {};
 	void	loop();
 
 private:
+	struct pollfd listen_fd;
 	unsigned int				_port;
 	std::string					_password;
 	struct sockaddr_in			_server_address;

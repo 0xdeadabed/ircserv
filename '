@@ -45,7 +45,9 @@ Server::Server(Server const &inst)
 
 Server::~Server()
 {
-	int	c = close(listen_fd.fd);
+	int	sh = shutdown(listen_fd.fd,SHUT_RDWR);
+	int	c = close(3);
+	std::cout << "shutdown: " << sh << std::endl;
 	std::cout << "close: " << c << std::endl;
 //todo
 }
@@ -78,11 +80,9 @@ void Server::loop()
 
 	while (1) {
 		if (run == false)
-			break ;
 		ready_fds = poll(&_watchlist[0], _watchlist.size(), 1000);
 		if (ready_fds < 0)
-			std::cout << "Poll error: " << ready_fds << std::endl;
-			//throw pollException();
+			throw pollException();
 		for (int i = ready_fds; i > 0 ; i--)
 		{
 			ind = this->get_next_fd();
@@ -95,7 +95,7 @@ void Server::loop()
 			_watchlist[ind].revents = 0;
 		}
 		this->disconnect_timeouts();
-//		sleep(1);
+		sleep(1);
 	}
 }
 
