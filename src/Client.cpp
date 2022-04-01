@@ -9,20 +9,16 @@
 #include <string>
 #include <sstream>
 #include "Client.hpp"
-#include "Server.hpp"
+//#include "Server.hpp"
 
-Client::Client(int listen_fd, Server &host) : host(host)
+Client::Client(int listen_fd, Server &serv): host(serv)
 {
-	char	ip[INET_ADDRSTRLEN + 1];
-
-	_fd = accept(listen_fd, (sockaddr *) &_addr, &_adrr_len);
+	_fd = accept(listen_fd, (sockaddr *) &_addr, &_addr_len);
 	if (_fd < 0)
-		throw clientException();
-	inet_ntop(AF_INET, &_addr, ip, INET_ADDRSTRLEN);
-	ip_address = ip;
+		throw	std::runtime_error("Error: couldn't connect a client");
+	ip_address = inet_ntoa(_addr.sin_addr);
 	_buffer = std::string();
 	_last_activity = std::time(NULL);
-	_queue = std::vector<std::string>();
 	_user = User();
 }
 
@@ -33,20 +29,21 @@ Client::Client(Client const &inst): host(inst.host)
 
 Client::~Client()
 {
-
+	std::cout << _fd << " client destroyed " << std::endl;
+	close(_fd);
 }
 
 Client &Client::operator=(Client const &rhs)
 {
 	_fd = rhs._fd;
 	_addr = rhs._addr;
-	_adrr_len = rhs._adrr_len;
+	_addr_len = rhs._addr_len;
 	ip_address = rhs.ip_address;
 	_user = rhs._user;
 	_buffer = rhs._buffer;
 	_last_activity = rhs._last_activity;
 	_queue = rhs._queue;
-	host = rhs.host;
+//	host = rhs.host;
 	return *this;
 }
 
@@ -70,7 +67,6 @@ void Client::read_inp()
 	char buffer[READ_LEN + 1];
 	int n;
 
-	//bzero(buffer, READ_LEN + 1);
 	memset(buffer, '\0', READ_LEN + 1);
 	while((n = read(this->_fd, buffer, READ_LEN)) == READ_LEN){
 		buffer[n] = 0;
@@ -151,8 +147,10 @@ void	Client::parse_cmd(std::string str, irc_cmd *cmd){
 
 std::string	Client::exec_cmd(const irc_cmd& cmd){
 	if (cmd.cmd == "DISCONNECT"){
-//		host._clients.erase(this);
+//		host.delete_client(this);
 
 		return ":ft_irc.com 200 :successfully disconnected";
 	}
+	return "Hi";
 }
+

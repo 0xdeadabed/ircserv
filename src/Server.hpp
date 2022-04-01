@@ -19,31 +19,33 @@
 # 	define IRC_SERV_PORT 6697
 # endif
 
+class	Client;
+
 class Server
 {
 public:
-	Server(unsigned int port = IRC_SERV_PORT, std::string password = "1234");
+	Server(const std::string &port, const std::string &password);
 	Server(Server const &inst);
 	~Server();
 
 class socketException: public std::exception {};
 class pollException: public std::exception {};
 
-	Server &operator=(Server const &rhs);
+	//Server &operator=(Server const &rhs);
 
 	void	loop();
 
 private:
+	typedef	std::vector<pollfd>::iterator	piterator;
 	struct pollfd listen_fd;
-	unsigned int				_port;
-	std::string					_password;
+	const	std::string					_port;
+	const	std::string					_password;
 	struct sockaddr_in			_server_address;
 	std::vector<struct pollfd>	_watchlist;
-	std::map<int, Client>		_clients;
+	std::map<int, Client *>		_clients;
 	std::vector<Channel>		_channels;
 
 	void			add_client();
-	int 			get_next_fd();
 	void			disconnect_timeouts();
 };
 

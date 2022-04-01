@@ -13,14 +13,19 @@
 #include "irc_cmd.h"
 #include "Server.hpp"
 
+class Server;
+
 #define READ_LEN 1024
+
+typedef	std::vector<pollfd>::iterator	cpiterator;
 
 class Client
 {
 public:
-	Client(int listen_fd, Server &host);
+	Client(int listen_fd, Server &serv);
 	Client(Client const &inst);
 	~Client();
+
 
 class clientException: public std::exception {};
 
@@ -31,8 +36,10 @@ class clientException: public std::exception {};
 
 private:
 	int							_fd;
+//	cpiterator					_pollfd;
+	
 	struct sockaddr_in			_addr;
-	socklen_t					_adrr_len;
+	socklen_t					_addr_len;
 	std::string					ip_address;
 	User						_user;
 	std::string					_buffer;
@@ -46,6 +53,7 @@ private:
 	void			manage_command(std::string cmd);
 	void			parse_cmd(std::string str, irc_cmd *cmd);
 	std::string		exec_cmd(const irc_cmd& cmd);
+
 };
 
 #endif //IRCSERV_CLIENT_HPP
