@@ -16,24 +16,27 @@ Server::Server(const std::string &port, const std::string &password):
 	listen_fd.events = POLLIN;
 	listen_fd.revents = 0;
 	if (listen_fd.fd < 0)
-		std::cout << "listen fd error" << std::endl;
+		throw std::runtime_error("socket creation error");
 	memset(&_server_address, '\0', sizeof(_server_address));
 	_server_address.sin_family = AF_INET;
 	_server_address.sin_addr.s_addr = htonl(INADDR_ANY);
 	_server_address.sin_port = htons(std::stoi(_port));
 
 	if (bind(listen_fd.fd, (sockaddr *) &_server_address, sizeof(_server_address)) < 0)
-		std::cout << "bind error caught" << std::endl;
+		throw std::runtime_error("bind error");
 	if (listen(listen_fd.fd, 10) < 0)
-		std::cout << "listen error caught" << std::endl;
+		throw std::runtime_error("listen error");
 
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
+	_clients = std::map<int, Client *>();
 	_channels = std::vector<Channel>();
 }
 
 Server::~Server()
 {
+	for (std::map<int, Client*>::iterator iter = _clients.begin(); iter != _clients.end(); ++iter)
+		delete iter->second;
 	int	c = close(listen_fd.fd);
 	std::cout << "close: " << c << std::endl;
 //todo
@@ -53,8 +56,13 @@ void Server::loop()
 	while (1) {
 		if (run == false)
 			break ;
-		if (poll(_watchlist.begin().base(), _watchlist.size(), 1000) < 0)
-			throw	std::runtime_error("Error in poll");
+		if (poll(_watchlist.begin().base(), _watchlist.size(), 1000) < 0){
+			if (errno == EINTR)
+				return;
+			else {
+				throw	std::runtime_error("Error in poll");
+			}
+		}
 		for (piterator it = _watchlist.begin(); it != _watchlist.end() ; it++)
 		{
 			if (it->revents == 0)
@@ -64,49 +72,28 @@ void Server::loop()
 				break;
 			} 
 			else if (it->revents){
-				_clients[it->fd]->manage_events(it->revents);
+				_clients.at(it->fd)->manage_events(it->revents);
 			}
 		}
 		this->disconnect_timeouts();
 	}
 }
 
-void	Server::add_client(void) {
-	int				fd;
-	struct	sockaddr_in		s_addr;
-	socklen_t		s_len =	sizeof(s_addr);
+void Server::add_client()
+{
+	try
+	{
+		Client *new_client = new Client((_watchlist[0]).fd, *this);
 
-	fd = accept(listen_fd.fd, (sockaddr *) &s_addr, &s_len);
-	if (fd < 0)
-		throw	std::runtime_error("Error: couldn't connect a client");
-	//std::cout << "KEVIN" << std::endl;
-	pollfd	pollfd = {fd, POLLIN, 0};
-	_watchlist.push_back(pollfd);
-
-	Client	*client = new Client(fd, _watchlist.end() - 1, inet_ntoa(s_addr.sin_addr), ntohs(s_addr.sin_port));
-	_clients.insert(std::make_pair(fd, client));
-
-	std::cout << client->getHost() << " connected" << std::endl;
+		pollfd	pollfd = {new_client->get_fd(), POLLIN | POLLOUT, 0};
+		_clients.insert(std::pair<int, Client *>(new_client->get_fd(), new_client));
+		_watchlist.push_back(pollfd);
+	}
+	catch (std::exception &e)
+	{
+		std::cout << "Error: " << e.what() << std::endl;
+	}
 }
-
-//void Server::add_client()
-//{
-//	try
-//	{
-//		Client new_client = Client((_watchlist[0]).fd);
-//		struct pollfd new_watch;
-//
-//		new_watch.fd = new_client.get_fd();
-//		new_watch.events = POLLIN | POLLOUT;
-//		new_watch.revents = 0;
-//		//_clients.insert(std::pair<int, Client>(new_client.get_fd(), new_client));
-//		_watchlist.push_back(new_watch);
-//	}
-//	catch (std::exception &e)
-//	{
-//		std::cout << "Error: " << e.what() << std::endl;
-//	}
-//}
 
 void Server::disconnect_timeouts()
 {

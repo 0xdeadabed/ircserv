@@ -13,43 +13,39 @@
 #include "irc_cmd.h"
 #include "Server.hpp"
 
+class Server;
+
 #define READ_LEN 1024
 
 typedef	std::vector<pollfd>::iterator	cpiterator;
-class	Server;
 
 class Client
 {
 public:
-	Client(int listen_fd);
-	Client(int listen_fd, const cpiterator &pollfd, const std::string &host, int port);
-	//Client(Client const &inst);
+	Client(int listen_fd, Server &serv);
+	Client(Client const &inst);
 	~Client();
 
 
-	std::string getHost() const { return _host; };
-
 class clientException: public std::exception {};
 
-	//Client &operator=(Client const &rhs);
+	Client &operator=(Client const &rhs);
 
 	int		get_fd() const;
 	void	manage_events(short revents);
 
 private:
 	int							_fd;
-	int							_port;
-	std::string					_host;
-	cpiterator					_pollfd;
+//	cpiterator					_pollfd;
 	
 	struct sockaddr_in			_addr;
-	socklen_t					_adrr_len;
+	socklen_t					_addr_len;
 	std::string					ip_address;
 	User						_user;
 	std::string					_buffer;
 	std::time_t					_last_activity;
 	std::vector<std::string>	_queue;
-	//Server						&host;
+	Server						&host;
 
 	void			read_inp();
 	void			send_out();

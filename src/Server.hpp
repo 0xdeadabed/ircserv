@@ -28,8 +28,6 @@ public:
 	Server(Server const &inst);
 	~Server();
 
-	void	connectClient(void);
-
 class socketException: public std::exception {};
 class pollException: public std::exception {};
 
@@ -48,7 +46,6 @@ private:
 	std::vector<Channel>		_channels;
 
 	void			add_client();
-	int 			get_next_fd();
 	void			disconnect_timeouts();
 };
 
