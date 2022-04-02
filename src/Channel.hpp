@@ -8,18 +8,31 @@
 #include <iostream>
 #include <vector>
 
+class Client;
+class User;
+
+typedef	std::vector<User *>::iterator	ch_it;
+
 class Channel
 {
 public:
 	Channel();
+	Channel(const std::string &name, const std::string &password, User *admin);
 	Channel(Channel const &inst);
 	~Channel();
 
 	Channel &operator=(Channel const &rhs);
 
+	std::string	getName();
+//	std::vector<std::string> getNicknames();
+	void	addUser(Client *user);
+//	void	joinMessage(std::string &message);
+
 private:
-	std::string name;
-	std::vector<std::string> _members;
+	std::string				_name;
+	std::string				_password;
+	std::vector<Client *>	_members;
+	User					*_admin;
 };
 
 

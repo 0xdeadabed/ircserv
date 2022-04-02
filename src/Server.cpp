@@ -30,7 +30,7 @@ Server::Server(const std::string &port, const std::string &password):
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
 	_clients = std::map<int, Client *>();
-	_channels = std::vector<Channel>();
+	_channels = std::vector<Channel *>();
 }
 
 Server::~Server()
@@ -97,11 +97,42 @@ void Server::add_client()
 
 void Server::disconnect_timeouts()
 {
-//	std::time_t timestamp = std::time(nullptr);
-//
-//	for( std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it )
-//	{
-//		//todo remove if timestamp to old
-////		if(it->second._time)
-//	}
+	std::time_t timestamp = std::time(nullptr);
+
+	for( std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); )
+	{
+		//todo define timestam
+		if(!it->second->_quit
+				&& it->second->is_registered()
+				&& std::difftime(timestamp, it->second->get_last_activity()) > 600){
+			it->second->_quit = true;
+			it->second->send_msg(":ircserv@42lausanne.ch DISCONNECTED :disconnected by timeout, bye!");
+		}
+		else if(!it->second->_quit
+				&& !it->second->is_registered()
+				&& std::difftime(timestamp, it->second->get_last_activity()) > 60){
+			it->second->_quit = true;
+			it->second->send_msg(":ircserv@42lausanne.ch DISCONNECTED :disconnected by timeout and no registration");
+		}
+		if (it->second->_quit && it->second->is_queue_empty()){
+			std::map<int, Client *>::iterator to_del = it;
+			it++;
+			delete_client(to_del->second);
+		} else {
+			it++;
+		}
+	}
+}
+
+void Server::delete_client(Client *c){
+	for (piterator i = _watchlist.begin(); i != _watchlist.end(); i++)
+	{
+		if(i->fd == c->get_fd()){
+			_watchlist.erase(i);
+			break;
+		}
+	}
+	close(c->get_fd());
+	_clients.erase(_clients.find(c->get_fd()));
+	delete c;
 }
