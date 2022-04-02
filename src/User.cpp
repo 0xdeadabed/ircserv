@@ -6,11 +6,8 @@
 
 User::User():
 	is_registered(false),
-	nickname("tbd"),
-	_is_op(false)
-{
-	_channels = std::vector<std::string>();
-}
+	_nickname("tbd"),
+	_is_op(false) {}
 
 User::User(User const &inst)
 {
@@ -25,8 +22,17 @@ User::~User()
 User &User::operator=(User const &rhs)
 {
 	is_registered = rhs.is_registered;
-	nickname = rhs.nickname;
+	_nickname = rhs._nickname;
 	_is_op = rhs._is_op;
-	_channels = rhs._channels;
+	_channel = rhs._channel;
 	return *this;
+}
+
+std::string	User::getNickname(void) {
+	return _nickname;
+}
+
+void	User::joinChannel(Channel *channel) {
+	channel->addUser(this);
+	_channel = channel;
 }

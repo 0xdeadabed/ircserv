@@ -14,6 +14,7 @@
 #include "Server.hpp"
 
 class Server;
+class User;
 
 #define READ_LEN 1024
 
@@ -41,7 +42,7 @@ private:
 	struct sockaddr_in			_addr;
 	socklen_t					_addr_len;
 	std::string					ip_address;
-	User						_user;
+	//User						_user;
 	std::string					_buffer;
 	std::time_t					_last_activity;
 	std::vector<std::string>	_queue;

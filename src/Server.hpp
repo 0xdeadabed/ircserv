@@ -20,6 +20,7 @@
 # endif
 
 class	Client;
+class	Channel;
 
 class Server
 {
@@ -43,7 +44,7 @@ private:
 	struct sockaddr_in			_server_address;
 	std::vector<struct pollfd>	_watchlist;
 	std::map<int, Client *>		_clients;
-	std::vector<Channel>		_channels;
+	std::vector<Channel *>		_channels;
 
 	void			add_client();
 	void			disconnect_timeouts();

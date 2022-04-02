@@ -7,6 +7,9 @@
 
 #include <vector>
 #include <iostream>
+#include "Channel.hpp"
+
+class Channel;
 
 class User
 {
@@ -17,11 +20,15 @@ public:
 
 	User &operator=(User const &rhs);
 
+	std::string	getNickname(void);
+	void	joinChannel(Channel *channel);
+
 private:
-	bool						is_registered;
-	std::string					nickname;
-	bool 						_is_op;
-	std::vector<std::string>	_channels;
+	bool			is_registered;
+	std::string		_nickname;
+	std::string		_username;
+	bool 			_is_op;
+	Channel			*_channel;
 };
 
 
