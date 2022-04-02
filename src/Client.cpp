@@ -8,10 +8,11 @@
 #include <cstring>
 #include <string>
 #include <sstream>
+#include "sys/socket.h"
 #include "Client.hpp"
 //#include "Server.hpp"
 
-Client::Client(int listen_fd, Server &serv): host(serv)
+Client::Client(int listen_fd, Server &serv): _quit(false), host(serv)
 {
 	_fd = accept(listen_fd, (sockaddr *) &_addr, &_addr_len);
 	if (_fd < 0)
@@ -30,7 +31,6 @@ Client::Client(Client const &inst): host(inst.host)
 
 Client::~Client()
 {
-	std::cout << _fd << " client destroyed " << std::endl;
 	close(_fd);
 }
 
@@ -44,7 +44,7 @@ Client &Client::operator=(Client const &rhs)
 	_buffer = rhs._buffer;
 	_last_activity = rhs._last_activity;
 	_queue = rhs._queue;
-//	host = rhs.host;
+	_quit = rhs._quit;
 	return *this;
 }
 
@@ -55,7 +55,7 @@ int Client::get_fd() const
 
 void Client::manage_events(short revents)
 {
-	if (revents & POLLIN){
+	if (revents & POLLIN && !this->_quit){
 		Client::read_inp();
 		Client::check_buff();
 	}
@@ -83,7 +83,7 @@ void Client::send_out()
 {
 	if (this->_queue.empty())
 		return;
-	write(this->_fd, &(this->_queue[0][0]), this->_queue[0].size());
+	send(this->_fd, &(this->_queue[0][0]), this->_queue[0].size(), MSG_DONTWAIT);
 	this->_queue.erase(this->_queue.begin());
 }
 
@@ -180,8 +180,22 @@ Client::irc_command	Client::get_cmd_id(const std::string& cmd){
 	return UNKNOWN;
 }
 
-int Client::is_registered() const
+bool Client::is_registered() const
 {
 	return _user.is_registered;
+}
+
+std::time_t	Client::get_last_activity() const{
+	return _last_activity;
+}
+
+void Client::send_msg(const std::string& msg)
+{
+	_queue.push_back(msg);
+}
+
+bool Client::is_queue_empty()
+{
+	return _queue.empty();
 }
 

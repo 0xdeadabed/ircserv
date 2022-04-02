@@ -29,15 +29,11 @@ public:
 	Server(Server const &inst);
 	~Server();
 
-class socketException: public std::exception {};
-class pollException: public std::exception {};
-
-	//Server &operator=(Server const &rhs);
-
 	void	loop();
 
 private:
 	typedef	std::vector<pollfd>::iterator	piterator;
+
 	struct pollfd listen_fd;
 	const	std::string					_port;
 	const	std::string					_password;
@@ -48,6 +44,7 @@ private:
 
 	void			add_client();
 	void			disconnect_timeouts();
+	void			delete_client(Client *c);
 };
 
 #endif //FT_IRC_SERVER_HPP

@@ -43,7 +43,12 @@ public:
 
 	int		get_fd() const;
 	void	manage_events(short revents);
-	int		is_registered() const;
+	bool	is_registered() const;
+	time_t	get_last_activity() const;
+	void	send_msg(const std::string& msg);
+	bool	is_queue_empty();
+
+	bool						_quit;
 
 private:
 	int							_fd;

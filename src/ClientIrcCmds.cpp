@@ -17,7 +17,7 @@ void	Client::join(){
 }
 
 void	Client::quit(){
-	std::cout << "got quit command" << std::endl;
+	_quit = true;
 }
 
 void	Client::pass(){
