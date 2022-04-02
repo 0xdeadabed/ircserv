@@ -19,7 +19,8 @@ Client::Client(int listen_fd, Server &serv): host(serv)
 	ip_address = inet_ntoa(_addr.sin_addr);
 	_buffer = std::string();
 	_last_activity = std::time(NULL);
-	_user = User();
+	_user.is_registered = false;
+	_user.is_oper = false;
 }
 
 Client::Client(Client const &inst): host(inst.host)
@@ -80,6 +81,8 @@ void Client::read_inp()
 
 void Client::send_out()
 {
+	if (this->_queue.empty())
+		return;
 	write(this->_fd, &(this->_queue[0][0]), this->_queue[0].size());
 	this->_queue.erase(this->_queue.begin());
 }
@@ -107,6 +110,9 @@ void Client::manage_command(std::string cmd)
 	if (cmd.empty())
 		return;
 	this->parse_cmd(cmd, &parsed_cmd);
+
+	this->exec_cmd(parsed_cmd);
+
 	answer.append("origin: " + parsed_cmd.origin + "\nCMD: " + parsed_cmd.cmd + "\nargs:");
 	for (int i = 0; i < (int)parsed_cmd.args.size(); i++){
 		answer.append("\n" + parsed_cmd.args[i]);
@@ -145,12 +151,37 @@ void	Client::parse_cmd(std::string str, irc_cmd *cmd){
 		cmd->args.push_back(last_arg);
 }
 
-std::string	Client::exec_cmd(const irc_cmd& cmd){
-	if (cmd.cmd == "DISCONNECT"){
-//		host.delete_client(this);
-
-		return ":ft_irc.com 200 :successfully disconnected";
+void	Client::exec_cmd(const irc_cmd& cmd){
+	switch (get_cmd_id(cmd.cmd)) {
+		case NICK: nick(); break;
+		case USER: user(); break;
+		case PASS: pass(); break;
+		case JOIN: join(); break;
+		case QUIT: quit(); break;
+		case UNKNOWN:
+			std::cout << "unknown command" << std::endl;
+			break;
+		default:
+			std::cout << "dropped command" << std::endl;
 	}
-	return "Hi";
+}
+
+Client::irc_command	Client::get_cmd_id(const std::string& cmd){
+	if (cmd == "NICK")
+		return NICK;
+	if (cmd == "USER")
+		return USER;
+	if (cmd == "JOIN")
+		return JOIN;
+	if (cmd == "QUIT")
+		return QUIT;
+	if (cmd == "PASS")
+		return PASS;
+	return UNKNOWN;
+}
+
+int Client::is_registered() const
+{
+	return _user.is_registered;
 }
 

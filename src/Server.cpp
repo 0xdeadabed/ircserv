@@ -30,7 +30,7 @@ Server::Server(const std::string &port, const std::string &password):
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
 	_clients = std::map<int, Client *>();
-	_channels = std::vector<Channel>();
+	_channels = std::vector<Channel *>();
 }
 
 Server::~Server()

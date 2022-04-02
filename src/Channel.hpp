@@ -7,9 +7,9 @@
 
 #include <iostream>
 #include <vector>
-#include "Client.hpp"
-#include "Server.hpp"
-#include "User.hpp"
+
+class Client;
+class User;
 
 typedef	std::vector<User *>::iterator	ch_it;
 
@@ -24,14 +24,14 @@ public:
 	Channel &operator=(Channel const &rhs);
 
 	std::string	getName();
-	std::vector<std::string> getNicknames();
-	void	addUser(User *user);
-	void	joinMessage(std::string &message);
+//	std::vector<std::string> getNicknames();
+	void	addUser(Client *user);
+//	void	joinMessage(std::string &message);
 
 private:
 	std::string				_name;
 	std::string				_password;
-	std::vector<User *>		_members;
+	std::vector<Client *>	_members;
 	User					*_admin;
 };
 
