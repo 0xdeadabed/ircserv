@@ -20,8 +20,9 @@ Client::Client(int listen_fd, Server &serv): _quit(false), host(serv)
 	ip_address = inet_ntoa(_addr.sin_addr);
 	_buffer = std::string();
 	_last_activity = std::time(NULL);
-	_user.is_registered = false;
+	_user.is_registered = true;
 	_user.is_oper = false;
+	_user._channel = new Channel;
 }
 
 Client::Client(Client const &inst): host(inst.host)
@@ -32,6 +33,7 @@ Client::Client(Client const &inst): host(inst.host)
 Client::~Client()
 {
 	close(_fd);
+	delete _user._channel;
 }
 
 Client &Client::operator=(Client const &rhs)
@@ -156,7 +158,7 @@ void	Client::exec_cmd(const irc_cmd& cmd){
 		case NICK: nick(); break;
 		case USER: user(); break;
 		case PASS: pass(); break;
-		case JOIN: join(); break;
+		case JOIN: join(_user._channel, this); break;
 		case QUIT: quit(); break;
 		case UNKNOWN:
 			std::cout << "unknown command" << std::endl;
@@ -198,4 +200,3 @@ bool Client::is_queue_empty()
 {
 	return _queue.empty();
 }
-

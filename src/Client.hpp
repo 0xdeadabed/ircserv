@@ -11,9 +11,16 @@
 #include <ctime>
 #include "irc_cmd.h"
 #include "poll.h"
+#include "Channel.hpp"
+
 
 class Server;
-class Channel;
+//class Channel;
+
+
+#define READ_LEN 1024
+
+typedef	std::vector<pollfd>::iterator	cpiterator;
 
 struct s_user{
 	std::string nickname;
@@ -23,12 +30,8 @@ struct s_user{
 	bool		is_oper;
 	bool		is_registered;
 	//todo replace by a channel perms class?
-	std::vector<Channel *> channels;
+	Channel 	*_channel;
 } typedef user;
-
-#define READ_LEN 1024
-
-typedef	std::vector<pollfd>::iterator	cpiterator;
 
 class Client
 {
@@ -42,6 +45,8 @@ public:
 	Client &operator=(Client const &rhs);
 
 	int		get_fd() const;
+	std::string	getNickname() { return _user.nickname; };
+	void setNickname(const std::string  &nickname) { _user.nickname = nickname; }
 	void	manage_events(short revents);
 	bool	is_registered() const;
 	time_t	get_last_activity() const;
@@ -84,9 +89,10 @@ private:
 	//irc_cmds
 	void	nick();
 	void	user();
-	void	join();
+	void	join(Channel *channel, Client *client);
 	void	quit();
 	void	pass();
+
 };
 
 #endif //IRCSERV_CLIENT_HPP

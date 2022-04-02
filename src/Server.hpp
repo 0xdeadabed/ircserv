@@ -34,9 +34,9 @@ public:
 private:
 	typedef	std::vector<pollfd>::iterator	piterator;
 
-	struct pollfd listen_fd;
-	const	std::string					_port;
-	const	std::string					_password;
+	struct pollfd				listen_fd;
+	const	std::string			_port;
+	const	std::string			_password;
 	struct sockaddr_in			_server_address;
 	std::vector<struct pollfd>	_watchlist;
 	std::map<int, Client *>		_clients;
