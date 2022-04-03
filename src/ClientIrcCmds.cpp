@@ -14,7 +14,7 @@ void	Client::nick(std::vector<std::string> args){
 	// TODO fix the args parsing
 }
 
-void	Client::user(){
+void	Client::usern(){
 	std::cout << "got user command" << std::endl;
 }
 

@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
+#include <signal.h>
 //#include "string.h"
 #include "Server.hpp"
 

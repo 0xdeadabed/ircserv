@@ -145,7 +145,7 @@ void Client::parse_cmd(std::string str, irc_cmd *cmd) {
 void Client::exec_cmd(const irc_cmd &cmd) {
 	switch (get_cmd_id(cmd.cmd)) {
 		case NICK: nick(cmd.args); break;
-		case USER: user(); break;
+		case USER: usern(); break;
 		case PASS: pass(); break;
 		case JOIN: join(_user._channel, this); break;
 		case QUIT: quit(); break;

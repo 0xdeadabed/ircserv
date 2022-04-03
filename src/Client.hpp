@@ -92,7 +92,7 @@ private:
 
 	//irc_cmds
 	void nick(std::vector<std::string> args);
-	void user();
+	void usern();
 	void join(Channel *channel, Client *client);
 	void quit();
 	void pass();
