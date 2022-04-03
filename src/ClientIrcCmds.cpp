@@ -10,6 +10,7 @@
 
 void	Client::nick(std::vector<std::string> args){
 	std::cout << "got nick command" << std::endl;
+	(void)args;
 	// TODO fix the args parsing
 }
 

@@ -21,7 +21,7 @@ Client::Client(int listen_fd, Server &serv) : _quit(false), _addr(), _addr_len()
 	_last_activity = std::time(NULL);
 	_user.is_registered = false;
 	_user.is_oper = false;
-//	_user._channel = new Channel;
+	_user._channel = new Channel;
 }
 
 Client::Client(Client const &inst) : _quit(), _fd(), _addr(), _addr_len(), _last_activity(), host(inst.host) {
