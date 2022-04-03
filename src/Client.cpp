@@ -12,32 +12,28 @@
 #include "Client.hpp"
 //#include "Server.hpp"
 
-Client::Client(int listen_fd, Server &serv): _quit(false), host(serv)
-{
+Client::Client(int listen_fd, Server &serv) : _quit(false), _addr(), _addr_len(), host(serv) {
 	_fd = accept(listen_fd, (sockaddr *) &_addr, &_addr_len);
 	if (_fd < 0)
-		throw	std::runtime_error("Error: couldn't connect a client");
+		throw std::runtime_error("Error: couldn't connect a client");
 	ip_address = inet_ntoa(_addr.sin_addr);
 	_buffer = std::string();
 	_last_activity = std::time(NULL);
-	_user.is_registered = true;
+	_user.is_registered = false;
 	_user.is_oper = false;
-	_user._channel = new Channel;
+//	_user._channel = new Channel;
 }
 
-Client::Client(Client const &inst): host(inst.host)
-{
+Client::Client(Client const &inst) : _quit(), _fd(), _addr(), _addr_len(), _last_activity(), host(inst.host) {
 	*this = inst;
 }
 
-Client::~Client()
-{
+Client::~Client() {
 	close(_fd);
 	delete _user._channel;
 }
 
-Client &Client::operator=(Client const &rhs)
-{
+Client &Client::operator=(Client const &rhs) {
 	_fd = rhs._fd;
 	_addr = rhs._addr;
 	_addr_len = rhs._addr_len;
@@ -50,14 +46,12 @@ Client &Client::operator=(Client const &rhs)
 	return *this;
 }
 
-int Client::get_fd() const
-{
+int Client::get_fd() const {
 	return _fd;
 }
 
-void Client::manage_events(short revents)
-{
-	if (revents & POLLIN && !this->_quit){
+void Client::manage_events(short revents) {
+	if (revents & POLLIN && !this->_quit) {
 		Client::read_inp();
 		Client::check_buff();
 	}
@@ -65,13 +59,12 @@ void Client::manage_events(short revents)
 		Client::send_out();
 }
 
-void Client::read_inp()
-{
+void Client::read_inp() {
 	char buffer[READ_LEN + 1];
 	int n;
 
 	memset(buffer, '\0', READ_LEN + 1);
-	while((n = read(this->_fd, buffer, READ_LEN)) == READ_LEN){
+	while ((n = recv(this->_fd, buffer, READ_LEN, 0)) == READ_LEN) {
 		buffer[n] = 0;
 		this->_buffer.append(buffer);
 	}
@@ -81,20 +74,18 @@ void Client::read_inp()
 	this->_buffer.append(buffer);
 }
 
-void Client::send_out()
-{
+void Client::send_out() {
 	if (this->_queue.empty())
 		return;
 	send(this->_fd, &(this->_queue[0][0]), this->_queue[0].size(), MSG_DONTWAIT);
 	this->_queue.erase(this->_queue.begin());
 }
 
-void Client::check_buff()
-{
+void Client::check_buff() {
 	size_t pos;
 	std::string temp;
 	//todo change
-	if ((pos = _buffer.find('\n')) != std::string::npos){
+	if ((pos = _buffer.find('\n')) != std::string::npos) {
 		if (pos == 0)
 			temp = "";
 		else
@@ -104,8 +95,7 @@ void Client::check_buff()
 	}
 }
 
-void Client::manage_command(std::string cmd)
-{
+void Client::manage_command(std::string cmd) {
 	std::string answer;
 	irc_cmd parsed_cmd;
 
@@ -116,35 +106,34 @@ void Client::manage_command(std::string cmd)
 	this->exec_cmd(parsed_cmd);
 
 	answer.append("origin: " + parsed_cmd.origin + "\nCMD: " + parsed_cmd.cmd + "\nargs:");
-	for (int i = 0; i < (int)parsed_cmd.args.size(); i++){
+	for (int i = 0; i < (int) parsed_cmd.args.size(); i++) {
 		answer.append("\n" + parsed_cmd.args[i]);
 	}
 	answer.append("\n");
 	_queue.push_back(answer);
 }
 
-static void split(std::string str, std::vector<std::string> *args){
+static void split(std::string str, std::vector<std::string> *args) {
 	size_t next;
 
-	while((next = str.find(' ')) != std::string::npos){
+	while ((next = str.find(' ')) != std::string::npos) {
 		args->push_back(str.substr(0, next));
 		str.erase(0, next + 1);
 	}
 }
 
-void	Client::parse_cmd(std::string str, irc_cmd *cmd){
+void Client::parse_cmd(std::string str, irc_cmd *cmd) {
 	std::string last_arg;
 
 	if (str[0] == ':') {
 		cmd->origin = str.substr(1, str.find(' ') - 1);
 		str.erase(0, str.find(' ') + 1);
-	}
-	else {
+	} else {
 		cmd->origin = ip_address;
 	}
 	cmd->cmd = str.substr(0, str.find(' '));
 	str.erase(0, str.find(' ') + 1);
-	if (str.find(':') != std::string::npos){
+	if (str.find(':') != std::string::npos) {
 		last_arg = str.substr(str.find(':') + 1);
 		str.erase(str.find(':'), std::string::npos);
 	}
@@ -153,13 +142,14 @@ void	Client::parse_cmd(std::string str, irc_cmd *cmd){
 		cmd->args.push_back(last_arg);
 }
 
-void	Client::exec_cmd(const irc_cmd& cmd){
+void Client::exec_cmd(const irc_cmd &cmd) {
 	switch (get_cmd_id(cmd.cmd)) {
-		case NICK: nick(); break;
+		case NICK: nick(cmd.args); break;
 		case USER: user(); break;
 		case PASS: pass(); break;
 		case JOIN: join(_user._channel, this); break;
 		case QUIT: quit(); break;
+		case LIST: list(this); break;
 		case UNKNOWN:
 			std::cout << "unknown command" << std::endl;
 			break;
@@ -168,7 +158,7 @@ void	Client::exec_cmd(const irc_cmd& cmd){
 	}
 }
 
-Client::irc_command	Client::get_cmd_id(const std::string& cmd){
+Client::irc_command Client::get_cmd_id(const std::string &cmd) {
 	if (cmd == "NICK")
 		return NICK;
 	if (cmd == "USER")
@@ -179,24 +169,23 @@ Client::irc_command	Client::get_cmd_id(const std::string& cmd){
 		return QUIT;
 	if (cmd == "PASS")
 		return PASS;
+	if (cmd == "LIST")
+		return LIST;
 	return UNKNOWN;
 }
 
-bool Client::is_registered() const
-{
+bool Client::is_registered() const {
 	return _user.is_registered;
 }
 
-std::time_t	Client::get_last_activity() const{
+std::time_t Client::get_last_activity() const {
 	return _last_activity;
 }
 
-void Client::send_msg(const std::string& msg)
-{
+void Client::send_msg(const std::string &msg) {
 	_queue.push_back(msg);
 }
 
-bool Client::is_queue_empty()
-{
+bool Client::is_queue_empty() {
 	return _queue.empty();
 }

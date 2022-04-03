@@ -22,29 +22,34 @@
 class	Client;
 class	Channel;
 
-class Server
-{
+class Server {
 public:
+	Server() {};
+
 	Server(const std::string &port, const std::string &password);
-	Server(Server const &inst);
+
+	//Server(Server const &inst);
 	~Server();
 
 	void	loop();
-
+	void	getChannels(Client *c);
 private:
-	typedef	std::vector<pollfd>::iterator	piterator;
+	typedef std::vector<pollfd>::iterator piterator;
 
-	struct pollfd				listen_fd;
-	const	std::string			_port;
-	const	std::string			_password;
-	struct sockaddr_in			_server_address;
-	std::vector<struct pollfd>	_watchlist;
-	std::map<int, Client *>		_clients;
-	std::vector<Channel *>		_channels;
+	struct pollfd listen_fd;
+	const std::string _port;
+	const std::string _password;
+	struct sockaddr_in _server_address;
+	std::vector<struct pollfd> _watchlist;
+	std::map<int, Client *> _clients;
+	std::vector<Channel *> _channels;
+	Channel *_gb;
 
-	void			add_client();
-	void			disconnect_timeouts();
-	void			delete_client(Client *c);
+	void add_client();
+
+	void disconnect_timeouts();
+
+	void delete_client(Client *c);
 };
 
 #endif //FT_IRC_SERVER_HPP

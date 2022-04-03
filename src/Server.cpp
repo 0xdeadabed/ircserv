@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
+//#include "string.h"
 #include "Server.hpp"
 
 Server::Server(const std::string &port, const std::string &password):
@@ -30,7 +31,8 @@ Server::Server(const std::string &port, const std::string &password):
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
 	_clients = std::map<int, Client *>();
-	_channels = std::vector<Channel *>();
+	_gb = new Channel();
+	_channels.push_back(_gb);
 }
 
 Server::~Server()
@@ -39,6 +41,7 @@ Server::~Server()
 		delete iter->second;
 	int	c = close(listen_fd.fd);
 	std::cout << "close: " << c << std::endl;
+	delete	_gb;
 //todo
 }
 
@@ -135,4 +138,16 @@ void Server::delete_client(Client *c){
 	close(c->get_fd());
 	_clients.erase(_clients.find(c->get_fd()));
 	delete c;
+}
+
+// Get a list of channels at LIST command
+void	Server::getChannels(Client *c) {
+	std::vector<Channel *>::iterator	it;
+
+	// Iterate over the channels and write them on the user.s fd
+	for (it = _channels.begin(); it != _channels.end(); it++) {
+		//std::cout << "client fd: " << c->get_fd() << std::endl;
+		send(c->get_fd(), (*it)->getName().c_str(), strlen((*it)->getName().c_str()), 0);
+		send(c->get_fd(), "\n", 1, 0);
+	}
 }
