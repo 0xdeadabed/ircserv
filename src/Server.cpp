@@ -60,6 +60,7 @@ void Server::loop()
 	while (1) {
 		if (run == false)
 			break ;
+		usleep(500);
 		if (poll(_watchlist.begin().base(), _watchlist.size(), 1000) < 0){
 			if (errno == EINTR)
 				return;
