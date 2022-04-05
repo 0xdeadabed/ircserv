@@ -7,9 +7,9 @@
 #define IRCSERV_MESSAGES_HPP
 
 #define RPL_JOIN(client, channel)		":" + client + " JOINED " + channel + "\n"
-#define ERR_NONNICK						"431 * :Nickname not given"
+#define ERR_NONNICK						"431 * :Nickname not given\n"
 //#define RPL_WELCOME(nick, user, host)	"Welcome to the Internet Relay Network " + nick + !user + @host
-#define ERR_USEDNICK					"433 * :Nickname is already in use"
-#define RPL_WELCOME(nick)				"001 * :Welcome to the Internet Relay Network network " + nick
+#define ERR_NICKNAMEINUSE				"433 * :Nickname is already in use\n"
+#define RPL_WELCOME(nick, user, host)			"001 * :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + "42.lausanne.ch\n"
 
 #endif //IRCSERV_MESSAGES_HPP

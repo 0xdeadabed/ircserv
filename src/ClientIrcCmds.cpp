@@ -15,11 +15,16 @@ void	Client::nick(std::vector<std::string> args){
 		return;
 	}
 	if (host.getClient(args[0])) {
-		this->send_msg(ERR_USEDNICK);
+		this->send_msg(ERR_NICKNAMEINUSE);
+		return;
 	}
-	_user.nickname = args[0];//std::to_string(_fd);
-	_user.is_registered = true;
-	this->send_msg(RPL_WELCOME(_user.nickname));
+	_user.nickname = args[0];
+	if (!_user.is_registered) {
+		_user.username = args[0];
+		//TODO registration on username maybe
+		_user.is_registered = true;
+		this->send_msg(RPL_WELCOME(_user.nickname, _user.username, _user.hostname));
+	}
 }
 
 void	Client::userName(){
