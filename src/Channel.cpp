@@ -6,10 +6,10 @@
 #include "Client.hpp"
 #include <unistd.h>
 
-Channel::Channel(): _name("general")
-{
-	_members = std::vector<Client *>();
-}
+//Channel::Channel(): _name("general")
+//{
+//	_members = std::vector<Client *>();
+//}
 
 Channel::Channel(const std::string &name, const std::string &password, Client *admin)
 	: _name(name), _password(password), _admin(admin) {
@@ -51,11 +51,12 @@ std::vector<std::string> Channel::getNicknames() {
 }
 
 void	Channel::addUser(Client *user) {
-//	if (user->is_registered())
+	if (user->is_registered())
 		_members.push_back(user);
-//	else {
-//		//todo
-//	}
+	else {
+		//todo
+		return ;
+	}
 }
 
 void	Channel::joinMessage(std::string const &message) {

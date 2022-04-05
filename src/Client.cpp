@@ -21,7 +21,7 @@ Client::Client(int listen_fd, Server &serv) : _quit(false), _addr(), _addr_len()
 	_last_activity = std::time(NULL);
 	_user.is_registered = false;
 	_user.is_oper = false;
-	_user._channel = new Channel;
+//	_user._channel = new Channel;
 }
 
 Client::Client(Client const &inst) : _quit(), _fd(), _addr(), _addr_len(), _last_activity(), host(inst.host) {
@@ -96,7 +96,7 @@ void Client::check_buff() {
 }
 
 void Client::manage_command(std::string cmd) {
-	std::string answer;
+//	std::string answer;
 	irc_cmd parsed_cmd;
 
 	if (cmd.empty())
@@ -105,12 +105,12 @@ void Client::manage_command(std::string cmd) {
 
 	this->exec_cmd(parsed_cmd);
 
-	answer.append("origin: " + parsed_cmd.origin + "\nCMD: " + parsed_cmd.cmd + "\nargs:");
-	for (int i = 0; i < (int) parsed_cmd.args.size(); i++) {
-		answer.append("\n" + parsed_cmd.args[i]);
-	}
-	answer.append("\n");
-	_queue.push_back(answer);
+//	answer.append("origin: " + parsed_cmd.origin + "\nCMD: " + parsed_cmd.cmd + "\nargs:");
+//	for (int i = 0; i < (int) parsed_cmd.args.size(); i++) {
+//		answer.append("\n" + parsed_cmd.args[i]);
+//	}
+//	answer.append("\n");
+//	_queue.push_back(answer);
 }
 
 static void split(std::string str, std::vector<std::string> *args) {
@@ -145,9 +145,9 @@ void Client::parse_cmd(std::string str, irc_cmd *cmd) {
 void Client::exec_cmd(const irc_cmd &cmd) {
 	switch (get_cmd_id(cmd.cmd)) {
 		case NICK: nick(cmd.args); break;
-		case USER: usern(); break;
+		case USER: userName(); break;
 		case PASS: pass(); break;
-		case JOIN: join(_user._channel, this); break;
+		case JOIN: join(this, cmd.args); break;
 		case QUIT: quit(); break;
 		case LIST: list(this); break;
 		case UNKNOWN:
@@ -183,6 +183,10 @@ std::time_t Client::get_last_activity() const {
 }
 
 void Client::send_msg(const std::string &msg) {
+//	std::string buffer = msg + "\r\n";
+//
+//	if (send(_fd, buffer.c_str(), buffer.length(), 0) < 0)
+//		throw	std::runtime_error("Error: couldn't send message to a client");
 	_queue.push_back(msg);
 }
 

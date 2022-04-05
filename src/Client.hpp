@@ -25,7 +25,7 @@ typedef std::vector<pollfd>::iterator cpiterator;
 
 struct s_user {
 	std::string nickname;
-	std::string name;
+	std::string username;
 	std::string real_name;
 	std::string hostname;
 	bool is_oper;
@@ -49,7 +49,7 @@ public:
 
 	int get_fd() const;
 	std::string getNickname() const { return _user.nickname; };
-	void setNickname(const std::string &nickname) { _user.nickname = nickname; }
+	std::string	getUsername() const { return _user.username; };
 	void send_msg(const std::string &msg);
 	void manage_events(short revents);
 
@@ -61,7 +61,6 @@ public:
 
 private:
 	int _fd;
-//	cpiterator					_pollfd;
 	struct sockaddr_in _addr;
 	socklen_t _addr_len;
 	std::string ip_address;
@@ -92,8 +91,8 @@ private:
 
 	//irc_cmds
 	void nick(std::vector<std::string> args);
-	void usern();
-	void join(Channel *channel, Client *client);
+	void userName();
+	void join(Client *client, std::vector<std::string> cmd);
 	void quit();
 	void pass();
 	void list(Client *c);

@@ -33,6 +33,7 @@ public:
 
 	void	loop();
 	void	getChannels(Client *c);
+	Client	*getClient(const std::string &nickname);
 private:
 	typedef std::vector<pollfd>::iterator piterator;
 
@@ -43,13 +44,15 @@ private:
 	std::vector<struct pollfd> _watchlist;
 	std::map<int, Client *> _clients;
 	std::vector<Channel *> _channels;
-	Channel *_gb;
+//	Channel *_gb;
 
-	void add_client();
+	void 		add_client();
 
-	void disconnect_timeouts();
+	void 		disconnect_timeouts();
 
-	void delete_client(Client *c);
+	void 		delete_client(Client *c);
+
+	Channel		*create_channel(const std::string &name, const std::string &password, Client *client);
 };
 
 #endif //FT_IRC_SERVER_HPP

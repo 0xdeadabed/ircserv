@@ -18,7 +18,7 @@ class Channel
 {
 	typedef	std::vector<Client *>::iterator	ch_it;
 public:
-	Channel();
+//	Channel();
 	Channel(const std::string &name, const std::string &password, Client *admin);
 	Channel(Channel const &inst);
 	~Channel();

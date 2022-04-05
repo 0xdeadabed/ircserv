@@ -14,6 +14,8 @@ Server::Server(const std::string &port, const std::string &password):
 	_port(port),
 	_password(password)
 {
+	//TODO set the password
+	(void)password;
 	listen_fd.fd = socket(AF_INET, SOCK_STREAM, 0);
 	listen_fd.events = POLLIN;
 	listen_fd.revents = 0;
@@ -32,8 +34,8 @@ Server::Server(const std::string &port, const std::string &password):
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
 	_clients = std::map<int, Client *>();
-	_gb = new Channel();
-	_channels.push_back(_gb);
+//	_gb = new Channel();
+//	_channels.push_back(_gb);
 }
 
 Server::~Server()
@@ -42,7 +44,7 @@ Server::~Server()
 		delete iter->second;
 	int	c = close(listen_fd.fd);
 	std::cout << "close: " << c << std::endl;
-	delete	_gb;
+//	delete	_gb;
 //todo
 }
 
@@ -60,6 +62,7 @@ void Server::loop()
 	while (1) {
 		if (run == false)
 			break ;
+		// poll would use 100% of the cpu if we don't give it a break <-usleep()->
 		usleep(500);
 		if (poll(_watchlist.begin().base(), _watchlist.size(), 1000) < 0){
 			if (errno == EINTR)
@@ -152,4 +155,18 @@ void	Server::getChannels(Client *c) {
 		send(c->get_fd(), (*it)->getName().c_str(), strlen((*it)->getName().c_str()), 0);
 		send(c->get_fd(), "\n", 1, 0);
 	}
+}
+
+Channel	*Server::create_channel(const std::string &name, const std::string &password, Client *client) {
+	Channel	*channel = new Channel(name, password, client);
+	_channels.push_back(channel);
+	return channel;
+}
+
+Client *Server::getClient(const std::string &nickname) {
+	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (!nickname.compare(it->second->getNickname()))
+			return it->second;
+	}
+	return NULL;
 }
