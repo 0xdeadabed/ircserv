@@ -35,7 +35,7 @@ all:	$(TEST_BINS)
 
 $(BIN_DIR)/%: ./%.cpp
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) $< $(OBJS) -L$(CRITERION_DIR) -lcriterion -o $@ -I$(CRITERION_INC) $(TEST_FLAGS)
+	@$(CC) $(CFLAGS) $< $(OBJS) -L$(CRITERION_DIR) -lcriterion -o $@ -Isrc -I$(CRITERION_INC) $(TEST_FLAGS)
 
 clean:
 	@rm -rf $(BIN_DIR)
