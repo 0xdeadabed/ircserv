@@ -48,6 +48,7 @@ public:
 
 	Client &operator=(Client const &rhs);
 
+//	Channel	*getChannel() { return _user._chnnel; }
 	int get_fd() const;
 	std::string getNickname() const { return _user.nickname; };
 	std::string	getUsername() const { return _user.username; };
@@ -89,11 +90,12 @@ private:
 	void parse_cmd(std::string str, irc_cmd *cmd);
 	void exec_cmd(const irc_cmd &cmd);
 	static irc_command get_cmd_id(const std::string &cmd);
+	void joinChannel(Channel *channel);
 
 	//irc_cmds
 	void nick(std::vector<std::string> args);
 	void userName(std::vector<std::string> args);
-	void join(Client *client, std::vector<std::string> cmd);
+	void join(std::vector<std::string> cmd);
 	void quit();
 	void pass(std::vector<std::string> args);
 	void list(Client *c);

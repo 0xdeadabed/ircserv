@@ -7,11 +7,8 @@
 #include "messages.hpp"
 #include <cstring>
 #include <string.h>
-//#include "Server.hpp"
 
-//class Server;
-
-void	Client::nick(std::vector<std::string> args){
+void Client::nick(std::vector<std::string> args) {
 	//TODO: maybe register if only user is logged
 	if (args.size() != 1) {
 		this->send_msg(ERR_NONNICK);
@@ -35,7 +32,7 @@ void	Client::nick(std::vector<std::string> args){
 	}
 }
 
-void	Client::userName(std::vector<std::string> args){
+void Client::userName(std::vector<std::string> args) {
 	//TODO: maybe register if only user is logged
 	if (_user.is_registered) {
 		this->send_msg(ERR_ALREADYREGISTERED);
@@ -50,25 +47,37 @@ void	Client::userName(std::vector<std::string> args){
 	_user.hostname = args[1];
 	_user.real_name = args[2];
 //	_queue.push_back(RPL_WELCOME(_user.username, _user.real_name, _user.hostname));
-
 }
 
-void	Client::join(Client *client, std::vector<std::string> cmd){
-//	std::string	admin;
-	(void )client;
-	(void )cmd;
-//	channel->addUser(this);
-//	_user._channel = channel;
-//	channel->joinMessage(RPL_JOIN(_user.nickname, channel->getName()));
-//	std::vector<std::string>	nicknames = channel->getNicknames();
+void Client::join(std::vector<std::string> args) {
+	if (!_user.is_registered) {
+		//TODO: send a nice message but now I'm too lazy to do it
+		return;
+	}
+
+	if (args.empty()) {
+		this->send_msg(ERR_NEEDMOREPARAMS("JOIN"));
+		return;
+	}
+
+	std::string password = args.size() > 1 ? args[1] : "";
+	std::string channel_name = args[0];
+	Channel *channel = host.getChannels(channel_name);
+	if (!channel)
+		channel = host.create_channel(channel_name, password, this);
+	if (channel->getPassword() != password) {
+		this->send_msg(ERR_BADCHANNELKEY(args[0]));
+		return;
+	}
+	this->joinChannel(channel);
 }
 
-void	Client::quit(){
+void Client::quit() {
 	_quit = true;
 	std::cout << "QUIT" << std::endl;
 }
 
-void	Client::pass(std::vector<std::string> args){
+void Client::pass(std::vector<std::string> args) {
 	if (_user.is_registered) {
 		this->send_msg(ERR_ALREADYREGISTERED);
 		return;
@@ -87,6 +96,6 @@ void	Client::pass(std::vector<std::string> args){
 	_user.is_logged = true;
 }
 
-void	Client::list(Client *c){
-	host.getChannels(c);
+void Client::list(Client *c) {
+	host.listChannel(c);
 }

@@ -32,7 +32,9 @@ public:
 	~Server();
 
 	void		loop();
-	void		getChannels(Client *c);
+	void		listChannel(Client *c);
+	Channel		*create_channel(const std::string &name, const std::string &password, Client *client);
+	Channel		*getChannels(const std::string &name);
 	Client		*getClient(const std::string &nickname);
 	std::string	getPass() const { return _password; };
 private:
@@ -53,7 +55,9 @@ private:
 
 	void 		delete_client(Client *c);
 
-	Channel		*create_channel(const std::string &name, const std::string &password, Client *client);
+
+
+//	Channel *getChannel(const std::string &name);
 };
 
 #endif //FT_IRC_SERVER_HPP

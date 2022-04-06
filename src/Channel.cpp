@@ -60,10 +60,6 @@ void	Channel::addUser(Client *user) {
 }
 
 void	Channel::joinMessage(std::string const &message) {
-	for(ch_it it = _members.begin(); it != _members.end(); it++)
+	for (ch_it it = _members.begin(); it != _members.end(); it++)
 		(*it)->send_msg(message);
-	for (ch_it it = _members.begin(); it != _members.end(); it++) {
-		write((*it)->get_fd(), "Someone joined\n",  15);
-	}
-		//TODO: Send a message to everyone
 }

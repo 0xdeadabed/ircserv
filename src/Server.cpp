@@ -32,8 +32,6 @@ Server::Server(const std::string &port, const std::string &password):
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
 	_clients = std::map<int, Client *>();
-//	_gb = new Channel();
-//	_channels.push_back(_gb);
 }
 
 Server::~Server()
@@ -42,7 +40,12 @@ Server::~Server()
 		delete iter->second;
 	int	c = close(listen_fd.fd);
 	std::cout << "close: " << c << std::endl;
-//	delete	_gb;
+	//TODO: fix the allocation problem, doesn't free well
+//	while (!_channels.empty()) {
+//		Channel* channel = _channels.back();
+//		_channels.pop_back();
+//		delete channel;
+//	}
 //todo
 }
 
@@ -143,8 +146,17 @@ void Server::delete_client(Client *c){
 	delete c;
 }
 
+ // return a pointer of a channel if it does exist
+Channel *Server::getChannels(const std::string &name) {
+	std::vector<Channel *>::iterator	it;
+	for (it = _channels.begin(); it != _channels.end(); it++)
+		if ((*it)->getName() == name)
+			return it.operator*();
+	return NULL;
+}
+
 // Get a list of channels at LIST command
-void	Server::getChannels(Client *c) {
+void	Server::listChannel(Client *c) {
 	std::vector<Channel *>::iterator	it;
 
 	// Iterate over the channels and write them on the user.s fd
@@ -154,6 +166,8 @@ void	Server::getChannels(Client *c) {
 		send(c->get_fd(), "\n", 1, 0);
 	}
 }
+
+
 
 Channel	*Server::create_channel(const std::string &name, const std::string &password, Client *client) {
 	Channel	*channel = new Channel(name, password, client);

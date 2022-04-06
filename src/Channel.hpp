@@ -29,6 +29,7 @@ public:
 	std::vector<std::string> getNicknames();
 	void	addUser(Client *user);
 	void	joinMessage(std::string const &message);
+	std::string getPassword() const { return _password; };
 
 private:
 	std::string				_name;
