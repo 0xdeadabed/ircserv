@@ -20,6 +20,7 @@ Client::Client(int listen_fd, Server &serv) : _quit(false), _addr(), _addr_len()
 	_buffer = std::string();
 	_last_activity = std::time(NULL);
 	_user.is_registered = false;
+	_user.is_logged = false;
 	_user.is_oper = false;
 //	_user._channel = new Channel;
 }
@@ -146,8 +147,8 @@ void Client::parse_cmd(std::string str, irc_cmd *cmd) {
 void Client::exec_cmd(const irc_cmd &cmd) {
 	switch (get_cmd_id(cmd.cmd)) {
 		case NICK: nick(cmd.args); break;
-		case USER: userName(); break;
-		case PASS: pass(); break;
+		case USER: userName(cmd.args); break;
+		case PASS: pass(cmd.args); break;
 		case JOIN: join(this, cmd.args); break;
 		case QUIT: quit(); break;
 		case LIST: list(this); break;

@@ -31,9 +31,10 @@ public:
 	//Server(Server const &inst);
 	~Server();
 
-	void	loop();
-	void	getChannels(Client *c);
-	Client	*getClient(const std::string &nickname);
+	void		loop();
+	void		getChannels(Client *c);
+	Client		*getClient(const std::string &nickname);
+	std::string	getPass() const { return _password; };
 private:
 	typedef std::vector<pollfd>::iterator piterator;
 

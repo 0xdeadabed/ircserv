@@ -14,8 +14,6 @@ Server::Server(const std::string &port, const std::string &password):
 	_port(port),
 	_password(password)
 {
-	//TODO set the password
-	(void)password;
 	listen_fd.fd = socket(AF_INET, SOCK_STREAM, 0);
 	listen_fd.events = POLLIN;
 	listen_fd.revents = 0;

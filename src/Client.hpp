@@ -28,8 +28,9 @@ struct s_user {
 	std::string username;
 	std::string real_name;
 	std::string hostname;
-	bool is_oper;
-	bool is_registered;
+	bool		is_oper;
+	bool		is_registered;
+	bool		is_logged;
 	//todo replace by a channel perms class?
 	Channel *_channel;
 } typedef user;
@@ -91,10 +92,10 @@ private:
 
 	//irc_cmds
 	void nick(std::vector<std::string> args);
-	void userName();
+	void userName(std::vector<std::string> args);
 	void join(Client *client, std::vector<std::string> cmd);
 	void quit();
-	void pass();
+	void pass(std::vector<std::string> args);
 	void list(Client *c);
 
 };
