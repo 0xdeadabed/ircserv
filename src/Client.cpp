@@ -12,6 +12,15 @@
 #include "Client.hpp"
 //#include "Server.hpp"
 
+//for tests
+Client::Client(Server &serv, int connect_fd): _quit(false), _fd(connect_fd), _addr(), _addr_len(), host(serv) {
+	ip_address = "127.0.0.1";
+	_buffer = std::string();
+	_last_activity = std::time(NULL);
+	_user.is_registered = false;
+	_user.is_oper = false;
+}
+
 Client::Client(int listen_fd, Server &serv) : _quit(false), _addr(), _addr_len(), host(serv) {
 	_fd = accept(listen_fd, (sockaddr *) &_addr, &_addr_len);
 	if (_fd < 0)
@@ -193,4 +202,8 @@ void Client::send_msg(const std::string &msg) {
 
 bool Client::is_queue_empty() {
 	return _queue.empty();
+}
+
+std::vector<std::string> &Client::get_queue(){
+	return _queue;
 }

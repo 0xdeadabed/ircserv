@@ -24,7 +24,7 @@ class	Channel;
 
 class Server {
 public:
-	Server() {};
+	Server();
 
 	Server(const std::string &port, const std::string &password);
 
