@@ -120,6 +120,7 @@ static void split(std::string str, std::vector<std::string> *args) {
 		args->push_back(str.substr(0, next));
 		str.erase(0, next + 1);
 	}
+	args->push_back(str);
 }
 
 void Client::parse_cmd(std::string str, irc_cmd *cmd) {
