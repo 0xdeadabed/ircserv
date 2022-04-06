@@ -48,7 +48,7 @@ public:
 
 	Client &operator=(Client const &rhs);
 
-//	Channel	*getChannel() { return _user._chnnel; }
+//	Channel	*getChannel() { return _user._channel; }
 	int get_fd() const;
 	std::string getNickname() const { return _user.nickname; };
 	std::string	getUsername() const { return _user.username; };

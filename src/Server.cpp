@@ -10,10 +10,9 @@
 //#include "string.h"
 #include "Server.hpp"
 
-Server::Server(const std::string &port, const std::string &password):
+Server::Server(const std::string &port, const std::string &password) :
 	_port(port),
-	_password(password)
-{
+	_password(password) {
 	listen_fd.fd = socket(AF_INET, SOCK_STREAM, 0);
 	listen_fd.events = POLLIN;
 	listen_fd.revents = 0;
@@ -34,11 +33,10 @@ Server::Server(const std::string &port, const std::string &password):
 	_clients = std::map<int, Client *>();
 }
 
-Server::~Server()
-{
-	for (std::map<int, Client*>::iterator iter = _clients.begin(); iter != _clients.end(); ++iter)
+Server::~Server() {
+	for (std::map<int, Client *>::iterator iter = _clients.begin(); iter != _clients.end(); ++iter)
 		delete iter->second;
-	int	c = close(listen_fd.fd);
+	int c = close(listen_fd.fd);
 	std::cout << "close: " << c << std::endl;
 	//TODO: fix the allocation problem, doesn't free well
 //	while (!_channels.empty()) {
@@ -51,36 +49,33 @@ Server::~Server()
 
 bool run = true;
 
-void	destroy(int n) {
-	(void)n;
+void destroy(int n) {
+	(void) n;
 	run = false;
 }
 
-void Server::loop()
-{
+void Server::loop() {
 	signal(SIGINT, destroy);
 
 	while (1) {
 		if (run == false)
-			break ;
+			break;
 		// poll would use 100% of the cpu if we don't give it a break <-usleep()->
 		usleep(500);
-		if (poll(_watchlist.begin().base(), _watchlist.size(), 1000) < 0){
+		if (poll(_watchlist.begin().base(), _watchlist.size(), 1000) < 0) {
 			if (errno == EINTR)
 				return;
 			else {
-				throw	std::runtime_error("Error in poll");
+				throw std::runtime_error("Error in poll");
 			}
 		}
-		for (piterator it = _watchlist.begin(); it != _watchlist.end() ; it++)
-		{
+		for (piterator it = _watchlist.begin(); it != _watchlist.end(); it++) {
 			if (it->revents == 0)
-				continue;	
+				continue;
 			if (it == _watchlist.begin() && (it->revents & POLLIN) == POLLIN) {
 				add_client();
 				break;
-			} 
-			else if (it->revents){
+			} else if (it->revents) {
 				_clients.at(it->fd)->manage_events(it->revents);
 			}
 		}
@@ -88,42 +83,36 @@ void Server::loop()
 	}
 }
 
-void Server::add_client()
-{
-	try
-	{
+void Server::add_client() {
+	try {
 		Client *new_client = new Client((_watchlist[0]).fd, *this);
 
-		pollfd	pollfd = {new_client->get_fd(), POLLIN | POLLOUT, 0};
+		pollfd pollfd = {new_client->get_fd(), POLLIN | POLLOUT, 0};
 		_clients.insert(std::pair<int, Client *>(new_client->get_fd(), new_client));
 		_watchlist.push_back(pollfd);
 	}
-	catch (std::exception &e)
-	{
+	catch (std::exception &e) {
 		std::cout << "Error: " << e.what() << std::endl;
 	}
 }
 
-void Server::disconnect_timeouts()
-{
+void Server::disconnect_timeouts() {
 	std::time_t timestamp = std::time(nullptr);
 
-	for( std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); )
-	{
+	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end();) {
 		//todo define timestam
-		if(!it->second->_quit
-				&& it->second->is_registered()
-				&& std::difftime(timestamp, it->second->get_last_activity()) > 600){
+		if (!it->second->_quit
+			&& it->second->is_registered()
+			&& std::difftime(timestamp, it->second->get_last_activity()) > 600) {
 			it->second->_quit = true;
 			it->second->send_msg(":ircserv@42lausanne.ch DISCONNECTED :disconnected by timeout, bye!");
-		}
-		else if(!it->second->_quit
-				&& !it->second->is_registered()
-				&& std::difftime(timestamp, it->second->get_last_activity()) > 60){
+		} else if (!it->second->_quit
+				   && !it->second->is_registered()
+				   && std::difftime(timestamp, it->second->get_last_activity()) > 60) {
 			it->second->_quit = true;
 			it->second->send_msg(":ircserv@42lausanne.ch DISCONNECTED :disconnected by timeout and no registration");
 		}
-		if (it->second->_quit && it->second->is_queue_empty()){
+		if (it->second->_quit && it->second->is_queue_empty()) {
 			std::map<int, Client *>::iterator to_del = it;
 			it++;
 			delete_client(to_del->second);
@@ -133,10 +122,9 @@ void Server::disconnect_timeouts()
 	}
 }
 
-void Server::delete_client(Client *c){
-	for (piterator i = _watchlist.begin(); i != _watchlist.end(); i++)
-	{
-		if(i->fd == c->get_fd()){
+void Server::delete_client(Client *c) {
+	for (piterator i = _watchlist.begin(); i != _watchlist.end(); i++) {
+		if (i->fd == c->get_fd()) {
 			_watchlist.erase(i);
 			break;
 		}
@@ -147,17 +135,17 @@ void Server::delete_client(Client *c){
 }
 
  // return a pointer of a channel if it does exist
-Channel *Server::getChannels(const std::string &name) {
-	std::vector<Channel *>::iterator	it;
-	for (it = _channels.begin(); it != _channels.end(); it++)
-		if ((*it)->getName() == name)
-			return it.operator*();
-	return NULL;
-}
+ Channel *Server::getChannels(const std::string &name) {
+	 std::vector<Channel *>::iterator it;
+	 for (it = _channels.begin(); it != _channels.end(); it++)
+		 if ((*it)->getName() == name)
+			 return it.operator*();
+	 return NULL;
+ }
 
 // Get a list of channels at LIST command
-void	Server::listChannel(Client *c) {
-	std::vector<Channel *>::iterator	it;
+void Server::listChannel(Client *c) {
+	std::vector<Channel *>::iterator it;
 
 	// Iterate over the channels and write them on the user.s fd
 	for (it = _channels.begin(); it != _channels.end(); it++) {
@@ -167,10 +155,8 @@ void	Server::listChannel(Client *c) {
 	}
 }
 
-
-
-Channel	*Server::create_channel(const std::string &name, const std::string &password, Client *client) {
-	Channel	*channel = new Channel(name, password, client);
+Channel *Server::create_channel(const std::string &name, const std::string &password, Client *client) {
+	Channel *channel = new Channel(name, password, client);
 	_channels.push_back(channel);
 	return channel;
 }
