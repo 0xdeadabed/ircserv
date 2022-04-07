@@ -5,3 +5,5 @@ set(CMAKE_CXX_STANDARD 98)
 
 file(GLOB SRCS src/*.cpp)
 add_executable(ircserv ${SRCS})
+
+add_subdirectory(tests)

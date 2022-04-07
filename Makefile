@@ -46,9 +46,9 @@ release: CFLAGS += -03 -march=native
 release: fclean
 release: all
 
-tests:
+tests: $(OBJS)
 	@printf "[$(_COLOR)make$(_END)] starting tests...\n"
-	@$(MAKE) -e TEST_FLAGS="$(TEST_FLAGS)" -C $(TESTS_DIR)
+	@$(MAKE) -e TEST_FLAGS="$(TEST_FLAGS)" -e TEST_OBJ="$(OBJS)" -C $(TESTS_DIR)
 
 $(LIB_FILES): library
 

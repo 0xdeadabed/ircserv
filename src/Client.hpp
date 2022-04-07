@@ -37,9 +37,8 @@ struct s_user {
 class Client {
 public:
 	Client(int listen_fd, Server &serv);
-
 	Client(Client const &inst);
-
+	Client(Server &serv, int connect_fd);
 	~Client();
 
 	class clientException : public std::exception {
@@ -56,11 +55,14 @@ public:
 
 	bool is_registered() const;
 	bool is_queue_empty();
+	std::vector<std::string> &get_queue();
 	bool _quit;
 
 	time_t get_last_activity() const;
 
 private:
+	friend class TestManager;
+
 	int _fd;
 	struct sockaddr_in _addr;
 	socklen_t _addr_len;
