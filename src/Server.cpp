@@ -52,8 +52,8 @@ Server::Server(const std::string &port, const std::string &password):
 Server::~Server() {
 	for (std::map<int, Client *>::iterator iter = _clients.begin(); iter != _clients.end(); ++iter)
 		delete iter->second;
-	int c = close(listen_fd.fd);
-	std::cout << "close: " << c << std::endl;
+	close(listen_fd.fd);
+//	std::cout << "close: " << c << std::endl;
 	//TODO: fix the allocation problem, doesn't free well
 //	std::vector<Channel *>::iterator itc;
 //	for ( itc = _channels.begin(); itc != _channels.end(); itc++)
