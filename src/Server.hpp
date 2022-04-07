@@ -35,6 +35,8 @@ public:
 	void	getChannels(Client *c);
 	Client	*getClient(const std::string &nickname);
 private:
+	friend class TestManager;
+
 	typedef std::vector<pollfd>::iterator piterator;
 
 	struct pollfd listen_fd;

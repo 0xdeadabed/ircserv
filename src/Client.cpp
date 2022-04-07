@@ -119,6 +119,7 @@ void Client::manage_command(std::string cmd) {
 //		answer.append("\n" + parsed_cmd.args[i]);
 //	}
 //	answer.append("\n");
+//	std::cout << answer << std::endl;
 //	_queue.push_back(answer);
 }
 

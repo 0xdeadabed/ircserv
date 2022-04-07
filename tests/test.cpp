@@ -1,7 +1,7 @@
 // tests.cpp template file
 
 #include <unistd.h>
-#include "Client.hpp"
+#include "utils/TestManager.hpp"
 #include "criterion/criterion.h"
 
 Test(example_tests, success) {
@@ -9,33 +9,28 @@ Test(example_tests, success) {
 }
 
 //Setup adn teardown
-Server *serv = NULL;
-Client *test = NULL;
-int		p[2];
+TestManager *manager;
 
 void suite_setup(){
-	serv = new Server();
-	pipe(p);
-	test = new Client(*serv, p[0]);
+	manager = new TestManager();
 }
 
 void suite_teardown(){
-	delete serv;
-	close(p[1]);
+	delete manager;
 }
 
-TestSuite(parsing, .init=suite_setup, .fini=suite_teardown);
+TestSuite(nick, .init=suite_setup, .fini=suite_teardown);
 
-Test(parsing, valid) {
+Test(nick, valid) {
 	try
 	{
-		write(p[1], "NICK John\n", strlen("NICK John\n"));
-		test->manage_events(POLLIN);
-		std::vector<std::string> &queue = test->get_queue();
-		cr_expect("001 * :Welcome to the Internet Relay Network John!John@42.lausanne.ch\n" == queue[0]);
+		q_ref queue = manager->test_cmd("USER John");
+		cr_assert(!queue.empty(), "NICK: no answer");
+		cr_expect(queue.at(0) == "smth", "NICK: wrong answer");
+		cr_expect(queue.size() > 1, "NICK: too many answers");
 	}
 	catch (std::exception &e)
 	{
-		std::cout << " ERNNO = " << strerror(errno) <<  std::endl;
+		std::cout << "caught smth " << e.what() <<  std::endl;
 	}
 }

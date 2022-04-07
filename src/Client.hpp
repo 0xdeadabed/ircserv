@@ -60,6 +60,8 @@ public:
 	time_t get_last_activity() const;
 
 private:
+	friend class TestManager;
+
 	int _fd;
 	struct sockaddr_in _addr;
 	socklen_t _addr_len;
