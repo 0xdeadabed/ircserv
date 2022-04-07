@@ -6,28 +6,19 @@
 #include "Client.hpp"
 #include <unistd.h>
 
-//Channel::Channel(): _name("general")
-//{
-//	_members = std::vector<Client *>();
-//}
-
 Channel::Channel(const std::string &name, const std::string &password, Client *admin)
 	: _name(name), _password(password), _admin(admin) {
 
 }
 
-Channel::Channel(Channel const &inst)
-{
+Channel::Channel(Channel const &inst) {
 	*this = inst;
 }
 
-Channel::~Channel()
-{
-
+Channel::~Channel() {
 }
 
-Channel &Channel::operator=(Channel const &rhs)
-{
+Channel &Channel::operator=(Channel const &rhs) {
 	_name = rhs._name;
 	_members = rhs._members;
 	_password = rhs._password;
@@ -35,7 +26,7 @@ Channel &Channel::operator=(Channel const &rhs)
 	return *this;
 }
 
-std::string	Channel::getName() {
+std::string Channel::getName() {
 	return _name;
 }
 
@@ -50,20 +41,29 @@ std::vector<std::string> Channel::getNicknames() {
 	return nicknames;
 }
 
-void	Channel::addUser(Client *user) {
+void Channel::addUser(Client *user) {
 	if (user->is_registered())
 		_members.push_back(user);
 	else {
 		//todo
-		return ;
+		return;
 	}
 }
 
-void	Channel::joinMessage(std::string const &message) {
-	for(ch_it it = _members.begin(); it != _members.end(); it++)
+void Channel::joinMessage(std::string const &message) {
+	for (ch_it it = _members.begin(); it != _members.end(); it++)
 		(*it)->send_msg(message);
-	for (ch_it it = _members.begin(); it != _members.end(); it++) {
-		write((*it)->get_fd(), "Someone joined\n",  15);
+}
+
+void	Channel::removeUser(Client *client) {
+	_members.erase(std::remove(_members.begin(), _members.end(), client), _members.end());
+
+	if (_members.empty())
+		return;
+
+	if (_admin == client) {
+		_admin = _members.begin().operator*();
+
+		//TODO send a message to everyone
 	}
-		//TODO: Send a message to everyone
 }

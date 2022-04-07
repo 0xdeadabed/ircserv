@@ -28,9 +28,9 @@ struct s_user {
 	std::string username;
 	std::string real_name;
 	std::string hostname;
-	bool is_oper;
-	bool is_registered;
-	//todo replace by a channel perms class?
+	bool		is_oper;
+	bool		is_registered;
+	bool		is_logged;
 	Channel *_channel;
 } typedef user;
 
@@ -46,6 +46,7 @@ public:
 
 	Client &operator=(Client const &rhs);
 
+	Channel	*getChannel() { return _user._channel; }
 	int get_fd() const;
 	std::string getNickname() const { return _user.nickname; };
 	std::string	getUsername() const { return _user.username; };
@@ -80,24 +81,28 @@ private:
 		JOIN,
 		QUIT,
 		LIST,
+		PART,
 		UNKNOWN
 	};
 
-	void read_inp();
-	void send_out();
-	void check_buff();
-	void manage_command(std::string cmd);
-	void parse_cmd(std::string str, irc_cmd *cmd);
-	void exec_cmd(const irc_cmd &cmd);
-	static irc_command get_cmd_id(const std::string &cmd);
+	void	read_inp();
+	void	send_out();
+	void	check_buff();
+	void	manage_command(const std::string& cmd);
+	void	parse_cmd(std::string str, irc_cmd *cmd);
+	void	exec_cmd(const irc_cmd &cmd);
+	static	irc_command get_cmd_id(const std::string &cmd);
+	void	joinChannel(Channel *channel);
+	void	leaveChannel();
 
 	//irc_cmds
-	void nick(std::vector<std::string> args);
-	void userName();
-	void join(Client *client, std::vector<std::string> cmd);
-	void quit();
-	void pass();
-	void list(Client *c);
+	void	nick(std::vector<std::string> args);
+	void	userName(std::vector<std::string> args);
+	void	join(std::vector<std::string> args);
+	void	quit();
+	void	pass(std::vector<std::string> args);
+	void	list(Client *c);
+	void	part(std::vector<std::string> args);
 
 };
 

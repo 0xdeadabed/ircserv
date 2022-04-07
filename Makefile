@@ -55,7 +55,7 @@ $(LIB_FILES): library
 run:
 	@$(MAKE) $(BIN_DIR)/$(NAME) | grep -v "is up to date" || true
 	@printf "[$(_COLOR)make$(_END)] running $(NAME)\n"
-	@$(BIN_DIR)/$(NAME) 6697 password
+	@$(BIN_DIR)/$(NAME) 6697 1234
 
 
 library:

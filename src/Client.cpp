@@ -10,6 +10,7 @@
 #include <sstream>
 #include "sys/socket.h"
 #include "Client.hpp"
+#include "messages.hpp"
 //#include "Server.hpp"
 
 //for tests
@@ -29,8 +30,8 @@ Client::Client(int listen_fd, Server &serv) : _quit(false), _addr(), _addr_len()
 	_buffer = std::string();
 	_last_activity = std::time(NULL);
 	_user.is_registered = false;
+	_user.is_logged = false;
 	_user.is_oper = false;
-//	_user._channel = new Channel;
 }
 
 Client::Client(Client const &inst) : _quit(), _fd(), _addr(), _addr_len(), _last_activity(), host(inst.host) {
@@ -104,7 +105,7 @@ void Client::check_buff() {
 	}
 }
 
-void Client::manage_command(std::string cmd) {
+void Client::manage_command(const std::string& cmd) {
 //	std::string answer;
 	irc_cmd parsed_cmd;
 
@@ -155,12 +156,13 @@ void Client::parse_cmd(std::string str, irc_cmd *cmd) {
 
 void Client::exec_cmd(const irc_cmd &cmd) {
 	switch (get_cmd_id(cmd.cmd)) {
-		case NICK: nick(cmd.args); break;
-		case USER: userName(); break;
-		case PASS: pass(); break;
-		case JOIN: join(this, cmd.args); break;
-		case QUIT: quit(); break;
-		case LIST: list(this); break;
+		case NICK: nick(cmd.args); break; //Done
+		case USER: userName(cmd.args); break; //Done
+		case PASS: pass(cmd.args); break; //Done
+		case JOIN: join(cmd.args); break; //Done
+		case QUIT: quit(); break; //Done
+		case LIST: list(this); break; //Done
+		case PART: part(cmd.args); break; //DONE
 		case UNKNOWN:
 			std::cout << "unknown command" << std::endl;
 			break;
@@ -182,6 +184,8 @@ Client::irc_command Client::get_cmd_id(const std::string &cmd) {
 		return PASS;
 	if (cmd == "LIST")
 		return LIST;
+	if (cmd == "PART")
+		return PART;
 	return UNKNOWN;
 }
 
@@ -194,10 +198,6 @@ std::time_t Client::get_last_activity() const {
 }
 
 void Client::send_msg(const std::string &msg) {
-//	std::string buffer = msg + "\r\n";
-//
-//	if (send(_fd, buffer.c_str(), buffer.length(), 0) < 0)
-//		throw	std::runtime_error("Error: couldn't send message to a client");
 	_queue.push_back(msg);
 }
 
@@ -207,4 +207,27 @@ bool Client::is_queue_empty() {
 
 std::vector<std::string> &Client::get_queue(){
 	return _queue;
+}
+
+void Client::joinChannel(Channel *channel) {
+
+	channel->addUser(this);
+	_user._channel = channel;
+
+	channel->joinMessage(RPL_JOIN(_user.nickname, channel->getName()));
+
+	std::string admins;
+	std::vector<std::string> nicknames = channel->getNicknames();
+	for (std::vector<std::string>::iterator it = nicknames.begin(); it != nicknames.end(); it++)
+		admins.append(it.operator*() + " ");
+
+	this->send_msg(RPL_NAMREPLY(_user.nickname, channel->getName(), admins));
+	this->send_msg(RPL_ENDOFNAMES(_user.nickname, channel->getName()));
+}
+
+void	Client::leaveChannel() {
+	if (!_user._channel)
+		return;
+
+	_user._channel->removeUser(this);
 }

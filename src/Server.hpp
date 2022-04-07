@@ -31,9 +31,12 @@ public:
 	//Server(Server const &inst);
 	~Server();
 
-	void	loop();
-	void	getChannels(Client *c);
-	Client	*getClient(const std::string &nickname);
+	void		loop();
+	void		listChannel(Client *c);
+	Channel		*create_channel(const std::string &name, const std::string &password, Client *client);
+	Channel		*getChannels(const std::string &name);
+	Client		*getClient(const std::string &nickname);
+	std::string	getPass() const { return _password; };
 private:
 	friend class TestManager;
 
@@ -46,15 +49,12 @@ private:
 	std::vector<struct pollfd> _watchlist;
 	std::map<int, Client *> _clients;
 	std::vector<Channel *> _channels;
-//	Channel *_gb;
 
 	void 		add_client();
 
 	void 		disconnect_timeouts();
 
 	void 		delete_client(Client *c);
-
-	Channel		*create_channel(const std::string &name, const std::string &password, Client *client);
 };
 
 #endif //FT_IRC_SERVER_HPP
