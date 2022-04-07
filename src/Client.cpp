@@ -154,7 +154,7 @@ void Client::exec_cmd(const irc_cmd &cmd) {
 		case LIST: list(this); break; //Done
 		case PART: part(cmd.args); break; //DONE
 		case UNKNOWN:
-			std::cout << "unknown command" << std::endl;
+			_queue.push_back(ERR_UNKNOWNCOMMAND(cmd.cmd));
 			break;
 		default:
 			std::cout << "dropped command" << std::endl;
