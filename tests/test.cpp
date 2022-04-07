@@ -24,10 +24,11 @@ TestSuite(nick, .init=suite_setup, .fini=suite_teardown);
 Test(nick, valid) {
 	try
 	{
-		q_ref queue = manager->test_cmd("USER John");
-		cr_assert(!queue.empty(), "NICK: no answer");
-		cr_expect(queue.at(0) == "smth", "NICK: wrong answer");
-		cr_expect(queue.size() > 1, "NICK: too many answers");
+		q_point queue = manager->test_cmd("USER John");
+		cr_assert(!queue->empty(), "NICK: no answer");
+		cr_expect(queue->at(0) == "smth", "NICK: wrong answer");
+		cr_expect(queue->size() > 1, "NICK: too many answers");
+		delete queue;
 	}
 	catch (std::exception &e)
 	{
