@@ -55,7 +55,6 @@ public:
 
 	bool is_registered() const;
 	bool is_queue_empty();
-	std::vector<std::string> &get_queue();
 	bool _quit;
 
 	time_t get_last_activity() const;

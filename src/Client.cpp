@@ -106,7 +106,7 @@ void Client::check_buff() {
 }
 
 void Client::manage_command(const std::string& cmd) {
-	std::string answer;
+//	std::string answer;
 	irc_cmd parsed_cmd;
 
 	if (cmd.empty())
@@ -115,12 +115,12 @@ void Client::manage_command(const std::string& cmd) {
 
 	this->exec_cmd(parsed_cmd);
 
-	answer.append("origin: " + parsed_cmd.origin + "\nCMD: " + parsed_cmd.cmd + "\nargs:");
-	for (int i = 0; i < (int) parsed_cmd.args.size(); i++) {
-		answer.append("\n" + parsed_cmd.args[i]);
-	}
-	answer.append("\n");
-	std::cout << answer << std::endl;
+//	answer.append("origin: " + parsed_cmd.origin + "\nCMD: " + parsed_cmd.cmd + "\nargs:");
+//	for (int i = 0; i < (int) parsed_cmd.args.size(); i++) {
+//		answer.append("\n" + parsed_cmd.args[i]);
+//	}
+//	answer.append("\n");
+//	std::cout << answer << std::endl;
 //	_queue.push_back(answer);
 }
 
@@ -203,10 +203,6 @@ void Client::send_msg(const std::string &msg) {
 
 bool Client::is_queue_empty() {
 	return _queue.empty();
-}
-
-std::vector<std::string> &Client::get_queue(){
-	return _queue;
 }
 
 void Client::joinChannel(Channel *channel) {
