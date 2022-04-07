@@ -47,17 +47,12 @@ private:
 	std::vector<struct pollfd> _watchlist;
 	std::map<int, Client *> _clients;
 	std::vector<Channel *> _channels;
-//	Channel *_gb;
 
 	void 		add_client();
 
 	void 		disconnect_timeouts();
 
 	void 		delete_client(Client *c);
-
-
-
-//	Channel *getChannel(const std::string &name);
 };
 
 #endif //FT_IRC_SERVER_HPP

@@ -15,7 +15,7 @@
 #define	ERR_PASSWDMISMATCH						"464 * :Password incorrect \n"
 #define	CH_NICK(o_nick, n_nick)					o_nick + " changed his nickname to " + n_nick + "\n"
 #define ERR_BADCHANNELKEY(channel)				"475 * " + channel + " :Cannot join channel (+k) \n"
-#define RPL_NAMREPLY(client, channels, admin)	"353 * " + client + " + " + channels + admin + "\n"
+#define RPL_NAMREPLY(client, channels, admin)	"353 * " + client + " + " + channels + "@" + admin + "\n"
 #define RPL_ENDOFNAMES(client, channel)			"366 * " + client + " " + channel + " :End of /NAMES list. \n"
 #define ERR_NOSUCHCHANNEL(channel)				"403 * " + channel + " :No such channel \n"
 #define ERR_NOTONCHANNEL(channel)				"442 * " + channel + " :You're not on that channel \n"

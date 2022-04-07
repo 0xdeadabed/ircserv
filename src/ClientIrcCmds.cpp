@@ -74,6 +74,7 @@ void Client::join(std::vector<std::string> args) {
 
 void Client::quit() {
 	_quit = true;
+	this->leaveChannel();
 	std::cout << "QUIT" << std::endl;
 }
 
