@@ -23,7 +23,6 @@ Client::Client(int listen_fd, Server &serv) : _quit(false), _addr(), _addr_len()
 	_user.is_registered = false;
 	_user.is_logged = false;
 	_user.is_oper = false;
-//	_user._channel = new Channel;
 }
 
 Client::Client(Client const &inst) : _quit(), _fd(), _addr(), _addr_len(), _last_activity(), host(inst.host) {
@@ -97,7 +96,7 @@ void Client::check_buff() {
 	}
 }
 
-void Client::manage_command(std::string cmd) {
+void Client::manage_command(const std::string& cmd) {
 //	std::string answer;
 	irc_cmd parsed_cmd;
 
@@ -147,12 +146,13 @@ void Client::parse_cmd(std::string str, irc_cmd *cmd) {
 
 void Client::exec_cmd(const irc_cmd &cmd) {
 	switch (get_cmd_id(cmd.cmd)) {
-		case NICK: nick(cmd.args); break;
-		case USER: userName(cmd.args); break;
-		case PASS: pass(cmd.args); break;
-		case JOIN: join(cmd.args); break;
-		case QUIT: quit(); break;
-		case LIST: list(this); break;
+		case NICK: nick(cmd.args); break; //Done
+		case USER: userName(cmd.args); break; //Done
+		case PASS: pass(cmd.args); break; //Done
+		case JOIN: join(cmd.args); break; //Done
+		case QUIT: quit(); break; //Done
+		case LIST: list(this); break; //Done
+		case PART: part(cmd.args); break; //DONE
 		case UNKNOWN:
 			std::cout << "unknown command" << std::endl;
 			break;
@@ -174,6 +174,8 @@ Client::irc_command Client::get_cmd_id(const std::string &cmd) {
 		return PASS;
 	if (cmd == "LIST")
 		return LIST;
+	if (cmd == "PART")
+		return PART;
 	return UNKNOWN;
 }
 
@@ -207,4 +209,11 @@ void Client::joinChannel(Channel *channel) {
 
 	this->send_msg(RPL_NAMREPLY(_user.nickname, channel->getName(), admins));
 	this->send_msg(RPL_ENDOFNAMES(_user.nickname, channel->getName()));
+}
+
+void	Client::leaveChannel() {
+	if (!_user._channel)
+		return;
+
+	_user._channel->removeUser(this);
 }

@@ -18,7 +18,6 @@ class Channel
 {
 	typedef	std::vector<Client *>::iterator	ch_it;
 public:
-//	Channel();
 	Channel(const std::string &name, const std::string &password, Client *admin);
 	Channel(Channel const &inst);
 	~Channel();
@@ -29,6 +28,7 @@ public:
 	std::vector<std::string> getNicknames();
 	void	addUser(Client *user);
 	void	joinMessage(std::string const &message);
+	void	removeUser(Client *client);
 	std::string getPassword() const { return _password; };
 
 private:

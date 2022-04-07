@@ -99,3 +99,23 @@ void Client::pass(std::vector<std::string> args) {
 void Client::list(Client *c) {
 	host.listChannel(c);
 }
+
+void	Client::part(std::vector<std::string> args) {
+	if (args.empty()) {
+		this->send_msg(ERR_NEEDMOREPARAMS("PART"));
+		return;
+	}
+	std::string	channel_name = args[0];
+
+	Channel	*channel = host.getChannels(channel_name);
+	if (!channel) {
+		this->send_msg(ERR_NOSUCHCHANNEL(channel_name));
+		return;
+	}
+	if (!this->getChannel() || this->getChannel()->getName() != channel_name) {
+		this->send_msg(ERR_NOTONCHANNEL(channel_name));
+		return;
+	}
+
+	this->leaveChannel();
+}
