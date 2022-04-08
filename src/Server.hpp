@@ -24,7 +24,7 @@ class	Channel;
 
 class Server {
 public:
-	Server() {};
+	Server();
 
 	Server(const std::string &port, const std::string &password);
 
@@ -38,6 +38,8 @@ public:
 	Client		*getClient(const std::string &nickname);
 	std::string	getPass() const { return _password; };
 private:
+	friend class TestManager;
+
 	typedef std::vector<pollfd>::iterator piterator;
 
 	struct pollfd listen_fd;

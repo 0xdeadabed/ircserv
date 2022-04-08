@@ -10,9 +10,9 @@ OBJ_DIR ?= ../build
 UNAME = $(shell uname -s)
 
 TEST_FLAGS ?=
+TEST_OBJ ?=
 
-SRCS = $(shell find $(SRC_DIR) -name *.cpp)
-OBJS = $(SRCS:%=$(OBJ_DIR)/%.o)
+UTILS_SRC = $(shell find ./utils -name "*.cpp")
 
 TESTS = $(shell find . -name *.cpp)
 BIN_DIR = ./bin
@@ -35,7 +35,7 @@ all:	$(TEST_BINS)
 
 $(BIN_DIR)/%: ./%.cpp
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) $< $(OBJS) -L$(CRITERION_DIR) -lcriterion -o $@ -Isrc -I$(CRITERION_INC) $(TEST_FLAGS)
+	@$(CC) $(CFLAGS) $< $(UTILS_SRC) $(addprefix ../,$(filter-out %main.cpp.o,$(TEST_OBJ))) -L$(CRITERION_DIR) -lcriterion -o $@ -I$(SRC_DIR) -I$(CRITERION_INC) $(TEST_FLAGS)
 
 clean:
 	@rm -rf $(BIN_DIR)
