@@ -1,4 +1,4 @@
-CFLAGS := -Wall -Wextra -Werror -g3 -fstack-protector #-fsanitize=address #-std=c++98 -pedantic
+CFLAGS := -Wall -Wextra -Werror -g3 -fstack-protector -fsanitize=address #-std=c++98 -pedantic
 CC = g++
 MAKEFLAGS += --no-print-directory
 
@@ -62,7 +62,7 @@ library:
 	@$(MAKE) -e CFLAGS="$(CFLAGS)" -C $(LIBS_DIR)
 
 all:	
-	@$(MAKE) $(NAME) && $(MAKE) tests
+	@$(MAKE) $(NAME) && $(MAKE) #tests
 
 clean:
 	@rm -rf $(BUILD_DIR)

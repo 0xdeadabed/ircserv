@@ -57,7 +57,11 @@ void Channel::sendMessage(std::string const &message) {
 }
 
 void	Channel::removeUser(Client *client) {
+	// A Bugy area
 	_members.erase(std::remove(_members.begin(), _members.end(), client), _members.end());
+//	for (ch_it it = _members.begin(); it != _members.end(); it++)
+//		if (client->getNickname() == (*it)->getNickname())
+//			_members.erase(it);
 
 	if (_members.empty())
 		return;
