@@ -12,7 +12,7 @@
 
 //for tests
 Server::Server():
-	_port("6697"),
+	_port(6697),
 	_password("password")
 {
 	listen_fd.fd = -1;
@@ -20,13 +20,13 @@ Server::Server():
 	memset(&_server_address, '\0', sizeof(_server_address));
 	_server_address.sin_family = AF_INET;
 	_server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-	_server_address.sin_port = htons(std::stoi(_port));
+	_server_address.sin_port = htons((_port));
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
 	_clients = std::map<int, Client *>();
 }
 
-Server::Server(const std::string &port, const std::string &password):
+Server::Server(const int &port, const std::string &password):
 	_port(port),
 	_password(password) {
 	listen_fd.fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -37,7 +37,7 @@ Server::Server(const std::string &port, const std::string &password):
 	memset(&_server_address, '\0', sizeof(_server_address));
 	_server_address.sin_family = AF_INET;
 	_server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-	_server_address.sin_port = htons(std::stoi(_port));
+	_server_address.sin_port = htons((_port));
 
 	if (bind(listen_fd.fd, (sockaddr *) &_server_address, sizeof(_server_address)) < 0)
 		throw std::runtime_error("bind error");

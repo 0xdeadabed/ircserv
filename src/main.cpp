@@ -3,6 +3,7 @@
 //
 
 #include "Server.hpp"
+#include <stdlib.h>
 
 int main(int argc, char **argv){
 	
@@ -10,7 +11,7 @@ int main(int argc, char **argv){
 		std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
 		return 1;
 	}
-	Server ircserv(argv[1], argv[2]);
+	Server ircserv(atoi(argv[1]), argv[2]);
 	ircserv.loop();
 	
 	return 0;
