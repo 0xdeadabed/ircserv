@@ -50,7 +50,7 @@ void Channel::addUser(Client *user) {
 	}
 }
 
-void Channel::joinMessage(std::string const &message) {
+void Channel::sendMessage(std::string const &message) {
 	for (ch_it it = _members.begin(); it != _members.end(); it++)
 		(*it)->send_msg(message);
 }

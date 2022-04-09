@@ -82,6 +82,7 @@ private:
 		QUIT,
 		LIST,
 		PART,
+		PRIVMSG,
 		UNKNOWN
 	};
 
@@ -103,6 +104,7 @@ private:
 	void	pass(std::vector<std::string> args);
 	void	list(Client *c);
 	void	part(std::vector<std::string> args);
+	void	pmsg(std::vector<std::string> args);
 
 };
 

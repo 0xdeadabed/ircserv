@@ -40,7 +40,7 @@ Client::Client(Client const &inst) : _quit(), _fd(), _addr(), _addr_len(), _last
 
 Client::~Client() {
 	close(_fd);
-	delete _user._channel;
+	//delete _user._channel;
 }
 
 Client &Client::operator=(Client const &rhs) {
@@ -163,6 +163,7 @@ void Client::exec_cmd(const irc_cmd &cmd) {
 		case QUIT: quit(); break; //Done
 		case LIST: list(this); break; //Done
 		case PART: part(cmd.args); break; //DONE
+		case PRIVMSG: pmsg(cmd.args); break;
 		case UNKNOWN:
 			_queue.push_back(ERR_UNKNOWNCOMMAND(cmd.cmd));
 			break;
@@ -186,6 +187,8 @@ Client::irc_command Client::get_cmd_id(const std::string &cmd) {
 		return LIST;
 	if (cmd == "PART")
 		return PART;
+	if (cmd == "PRIVMSG")
+		return PRIVMSG;
 	return UNKNOWN;
 }
 
@@ -214,13 +217,12 @@ void Client::joinChannel(Channel *channel) {
 	channel->addUser(this);
 	_user._channel = channel;
 
-	channel->joinMessage(RPL_JOIN(_user.nickname, channel->getName()));
+	channel->sendMessage(RPL_JOIN(_user.nickname, channel->getName()));
 
 	std::string admins;
 	std::vector<std::string> nicknames = channel->getNicknames();
 	for (std::vector<std::string>::iterator it = nicknames.begin(); it != nicknames.end(); it++)
 		admins.append(it.operator*() + " ");
-
 	this->send_msg(RPL_NAMREPLY(_user.nickname, channel->getName(), admins));
 	this->send_msg(RPL_ENDOFNAMES(_user.nickname, channel->getName()));
 }

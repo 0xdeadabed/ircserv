@@ -50,7 +50,7 @@ void Client::userName(std::vector<std::string> args) {
 }
 
 void Client::join(std::vector<std::string> args) {
-	if (!_user.is_registered) {
+	if (!_user.is_registered || _user.nickname.empty()) {
 		//TODO: send a nice message but now I'm too lazy to do it
 		return;
 	}
@@ -119,4 +119,31 @@ void	Client::part(std::vector<std::string> args) {
 	}
 
 	this->leaveChannel();
+}
+
+void Client::pmsg(std::vector<std::string> args) {
+	if (args.size() < 2) {
+		this->send_msg(ERR_NEEDMOREPARAMS("PRIVMSG"));
+		return;
+	}
+	std::string message;
+	for (std::vector<std::string>::iterator it = args.begin() + 1; it != args.end(); it++)
+		message.append(*it + " ");
+	message.append("\n");
+	if (args[0][0] == '#') {
+		Channel *channel;
+		if ((channel = this->getChannel()) != NULL) {
+			channel->sendMessage(message);
+			return;
+		}
+		this->send_msg(ERR_NOSUCHCHANNEL(args[0]));
+	}
+
+	Client *dst;
+	if ((dst = host.getClient(args[0])) != NULL) {
+		dst->send_msg(message);
+		return;
+	}
+	//TODO no such name
+	this->send_msg(ERR_NOSUCHCHANNEL(args[0]));
 }
