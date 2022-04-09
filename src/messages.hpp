@@ -7,8 +7,8 @@
 #define IRCSERV_MESSAGES_HPP
 
 #define RPL_JOIN(client, channel)				":" + client + " JOINED " + channel + "\r\n"
-#define ERR_NONNICK								"431 * :Nickname not given\r\n"
-#define ERR_NICKNAMEINUSE						"433 * :Nickname is already in use\r\n"
+#define ERR_NONICKNAMEGIVEN						"431 * ::No nickname given\r\n"
+#define ERR_NICKNAMEINUSE(nick)					"433 * " + nick + " :Nickname is already in use\r\n"
 #define RPL_WELCOME(nick, user, host)			"001 * :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + "42.lausanne.ch\r\n"
 #define ERR_ALREADYREGISTERED					":Unauthorized command (already registered)\r\n"
 #define	ERR_NEEDMOREPARAMS(cmd)					"461 * " cmd " :Not enough parameters\r\n"

@@ -11,25 +11,25 @@
 void Client::nick(std::vector<std::string> args) {
 	//TODO: maybe register if only user is logged
 	if (args.size() != 1) {
-		this->send_msg(ERR_NONNICK);
+		this->send_msg(ERR_NONICKNAMEGIVEN);
 		return;
 	}
 	if (host.getClient(args[0])) {
-		this->send_msg(ERR_NICKNAMEINUSE);
+		this->send_msg(ERR_NICKNAMEINUSE(args[0]));
 		return;
 	}
-	if (!_user.is_registered) {
-		_user.nickname = args[0];
-		_user.username = args[0];
-		_user.is_registered = true;
-		_queue.push_back(RPL_WELCOME(_user.nickname, _user.username, _user.hostname));
-	} else {
+//	if (!_user.is_registered) {
+//		_user.nickname = args[0];
+//		_user.username = args[0];
+//		_user.is_registered = true;
+//		_queue.push_back(RPL_WELCOME(_user.nickname, _user.username, _user.hostname));
+//	} else {
 		if (!_user.nickname.empty())
 			_queue.push_back(CH_NICK(_user.nickname, args[0]));
-		else
-			_queue.push_back(RPL_WELCOME(_user.nickname, _user.username, _user.hostname));
+//		else
+//			_queue.push_back(RPL_WELCOME(_user.nickname, _user.username, _user.hostname));
 		_user.nickname = args[0];
-	}
+//	}
 }
 
 void Client::userName(std::vector<std::string> args) {
