@@ -148,3 +148,7 @@ void Client::pmsg(std::vector<std::string> args) {
 	//TODO no such name
 	this->send_msg(ERR_NOSUCHCHANNEL(args[0]));
 }
+
+void	Client::cap() {
+	this->send_msg("\r\n");
+}

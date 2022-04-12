@@ -165,6 +165,7 @@ void Client::exec_cmd(const irc_cmd &cmd) {
 		case LIST: list(this); break; //Done
 		case PART: part(cmd.args); break; //DONE
 		case PRIVMSG: pmsg(cmd.args); break;
+		case CAP: cap(); break;
 		case UNKNOWN:
 			_queue.push_back(ERR_UNKNOWNCOMMAND(cmd.cmd));
 			break;
@@ -190,6 +191,8 @@ Client::irc_command Client::get_cmd_id(const std::string &cmd) {
 		return PART;
 	if (cmd == "PRIVMSG")
 		return PRIVMSG;
+	if (cmd == "CAP")
+		return CAP;
 	return UNKNOWN;
 }
 

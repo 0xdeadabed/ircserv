@@ -83,6 +83,7 @@ private:
 		LIST,
 		PART,
 		PRIVMSG,
+		CAP,
 		UNKNOWN
 	};
 
@@ -105,6 +106,7 @@ private:
 	void	list(Client *c);
 	void	part(std::vector<std::string> args);
 	void	pmsg(std::vector<std::string> args);
+	void	cap();
 
 };
 
