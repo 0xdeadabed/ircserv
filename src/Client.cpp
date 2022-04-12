@@ -96,12 +96,12 @@ void Client::check_buff() {
 	size_t pos;
 	std::string temp;
 	//todo change
-	if ((pos = _buffer.find('\n')) != std::string::npos) {
+	if ((pos = _buffer.find("\r\n")) != std::string::npos) {
 		if (pos == 0)
 			temp = "";
 		else
 			temp = _buffer.substr(0, pos);
-		_buffer.erase(0, pos + 1);
+		_buffer.erase(0, pos + 2);
 		this->manage_command(temp);
 	}
 }

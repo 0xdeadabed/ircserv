@@ -1,4 +1,4 @@
-CFLAGS := -Wall -Wextra -Werror -g3 -fstack-protector -fsanitize=address -std=c++98 -pedantic
+CFLAGS := -Wall -Wextra -Werror -g3 -fstack-protector -std=c++98 -pedantic #-fsanitize=address
 CC = g++
 MAKEFLAGS += --no-print-directory
 
