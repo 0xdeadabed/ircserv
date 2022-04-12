@@ -16,11 +16,25 @@ TestManager::~TestManager()
 
 }
 
-q_point TestManager::test_cmd(std::string cmd){
-	q_point ret;
-
+void	TestManager::test_cmd(const std::string& cmd){
 	client.manage_command(cmd);
-	ret = new std::vector<std::string>(client._queue);
+}
+
+q_ref TestManager::get_queue(){
+	return client._queue;
+}
+
+void TestManager::print_queue(q_ref q)
+{
+	std::cout << "queue dump:"<< std::endl;
+	for (int i = 0; i < (int) q.size(); ++i)
+	{
+		std::cout << q.at(i);
+	}
+	std::cout << "---" << std::endl;
+}
+
+void TestManager::clear_queue()
+{
 	client._queue.clear();
-	return ret;
 }

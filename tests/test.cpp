@@ -4,10 +4,6 @@
 #include "utils/TestManager.hpp"
 #include "criterion/criterion.h"
 
-Test(example_tests, success) {
-	cr_expect(true, "this test should be true");
-}
-
 //Setup adn teardown
 TestManager *manager;
 
@@ -19,19 +15,61 @@ void suite_teardown(){
 	delete manager;
 }
 
-TestSuite(nick, .init=suite_setup, .fini=suite_teardown);
+TestSuite(cmds, .init=suite_setup, .fini=suite_teardown);
 
-Test(nick, valid) {
-	try
-	{
-		q_point queue = manager->test_cmd("USER John");
-		cr_assert(!queue->empty(), "NICK: no answer");
-		cr_expect(queue->at(0) == "smth", "NICK: wrong answer");
-		cr_expect(queue->size() > 1, "NICK: too many answers");
-		delete queue;
-	}
-	catch (std::exception &e)
-	{
-		std::cout << "caught smth " << e.what() <<  std::endl;
-	}
+Test(cmds, connection) {
+	manager->test_cmd("NICK johnny");
+	manager->test_cmd("USER John 0 * :John Smith");
+	manager->test_cmd("PASS password");
+	q_ref queue = manager->get_queue();
+	cr_assert(!queue.empty(), "no answer");
+	cr_expect(queue.at(0) == "001 * :Welcome to the Internet Relay Network johnny!John@42.lausanne.ch\r\n", "wrong answer");
+	cr_expect(queue.size() == 1, "too many answers");
+	manager->clear_queue();
+}
+
+Test(cmds, nick_ERR_NONICKNAMEGIVEN) {
+	manager->test_cmd("NICK");
+	q_ref queue = manager->get_queue();
+	cr_assert(!queue.empty(), "no answer");
+	cr_expect(queue.at(0) == "431 :No nickname given\r\n", "should answer no nickname given");
+	cr_expect(queue.size() == 1, "too many answers");
+	manager->clear_queue();
+}
+
+Test(cmds, ERR_NEEDMOREPARAMS) {
+	q_ref queue = manager->get_queue();
+	//USER
+	manager->test_cmd("USER a b c");
+	cr_assert(!queue.empty(), "no answer");
+	cr_expect(queue.at(0) == "461 USER :Not enough parameters\r\n", "should answer not enough params");
+	cr_expect(queue.size() == 1, "too many answers");
+	manager->clear_queue();
+	//PASS
+	manager->test_cmd("PASS");
+	cr_assert(!queue.empty(), "no answer");
+	cr_expect(queue.at(0) == "461 PASS :Not enough parameters\r\n", "should answer not enough params");
+	cr_expect(queue.size() == 1, "too many answers");
+	manager->clear_queue();
+}
+
+Test(cmds, ERR_ALREADYREGISTERED) {
+	q_ref queue = manager->get_queue();
+	//registering
+	manager->test_cmd("NICK johnny");
+	manager->test_cmd("USER John 0 * :John Smith");
+	manager->test_cmd("PASS password");
+	manager->clear_queue();
+	//PASS
+	manager->test_cmd("PASS pass");
+	cr_assert(!queue.empty(), "no answer");
+	cr_expect(queue.at(0) == "462 :Unauthorized command (already registered)\r\n", "should answer already registered");
+	cr_expect(queue.size() == 1, "too many answers");
+	manager->clear_queue();
+	//USER
+	manager->test_cmd("USER John 0 * :John Smith");
+	cr_assert(!queue.empty(), "no answer");
+	cr_expect(queue.at(0) == "462 :Unauthorized command (already registered)\r\n", "should answer already registered");
+	cr_expect(queue.size() == 1, "too many answers");
+	manager->clear_queue();
 }

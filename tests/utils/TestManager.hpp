@@ -8,7 +8,7 @@
 #include "Client.hpp"
 #include "Server.hpp"
 
-typedef std::vector<std::string> *q_point;
+typedef std::vector<std::string> &q_ref;
 
 class TestManager
 {
@@ -17,7 +17,10 @@ public:
 	Server server;
 	Client client;
 
-	q_point	test_cmd(std::string cmd);
+	void	test_cmd(const std::string& cmd);
+	q_ref	get_queue();
+	void	clear_queue();
+	static void	print_queue(q_ref q);
 
 	TestManager();
 	~TestManager();

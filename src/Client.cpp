@@ -212,10 +212,6 @@ bool Client::is_queue_empty() {
 	return _queue.empty();
 }
 
-std::vector<std::string> &Client::get_queue(){
-	return _queue;
-}
-
 void Client::joinChannel(Channel *channel) {
 
 	channel->addUser(this);
