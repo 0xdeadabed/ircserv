@@ -29,7 +29,7 @@ void TestManager::print_queue(q_ref q)
 	std::cout << "queue dump:"<< std::endl;
 	for (int i = 0; i < (int) q.size(); ++i)
 	{
-		std::cout << q.at(i);
+		std::cout << "[" << i << "]" << q.at(i);
 	}
 	std::cout << "---" << std::endl;
 }

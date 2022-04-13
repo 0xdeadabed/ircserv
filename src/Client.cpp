@@ -112,6 +112,8 @@ void Client::manage_command(const std::string& cmd) {
 //	std::string answer;
 	irc_cmd parsed_cmd;
 
+//	std::cout << cmd << "|";
+
 	if (cmd.empty())
 		return;
 	this->parse_cmd(cmd, &parsed_cmd);
@@ -120,7 +122,7 @@ void Client::manage_command(const std::string& cmd) {
 
 //	answer.append("origin: " + parsed_cmd.origin + "\nCMD: " + parsed_cmd.cmd + "\nargs:");
 //	for (int i = 0; i < (int) parsed_cmd.args.size(); i++) {
-//		answer.append("\n" + parsed_cmd.args[i]);
+//		answer.append("\n[" + std::to_string(i) + "]" + parsed_cmd.args[i] + "|");
 //	}
 //	answer.append("\n");
 //	std::cout << answer << std::endl;

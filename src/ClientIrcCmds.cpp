@@ -19,7 +19,7 @@ void Client::nick(std::vector<std::string> args) {
 		_queue.push_back(CH_NICK(_user.nickname, args[0]));
 	}
 	_user.nickname = args[0];
-	if (_user.is_logged && !_user.username.empty() && !_user.wlc) {
+	if (!_user.username.empty() && !_user.wlc) {
 		_queue.push_back(RPL_WELCOME(_user.nickname, _user.username));
 		_user.wlc = true;
 		_user.is_registered = true;
@@ -39,7 +39,7 @@ void Client::userName(std::vector<std::string> args) {
 	_user.mode = args[1];
 	_user.unused = args[2];
 	_user.real_name = args[3];
-	if (_user.is_logged && !_user.nickname.empty() && !_user.wlc) {
+	if (!_user.nickname.empty() && !_user.wlc) {
 		_queue.push_back(RPL_WELCOME(_user.nickname, _user.username));
 		_user.wlc = true;
 		_user.is_registered = true;
