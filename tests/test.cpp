@@ -20,7 +20,7 @@ TestSuite(cmds, .init=suite_setup, .fini=suite_teardown);
 Test(cmds, connection) {
 	manager->test_cmd("NICK johnny\r\n");
 	manager->test_cmd("USER John 0 * :John Smith\r\n");
-	manager->test_cmd("PASS password\r\n");
+	manager->test_cmd("PASS 1234\r\n");
 	q_ref queue = manager->get_queue();
 	cr_assert(!queue.empty(), "Connection: no answer");
 	cr_expect(queue.at(0) == "001 * :Welcome to the Internet Relay Network johnny!John@42.lausanne.ch\r\n", "Connection: answer contents");
@@ -58,10 +58,10 @@ Test(cmds, ERR_ALREADYREGISTERED) {
 	//registering
 	manager->test_cmd("NICK johnny\r\n");
 	manager->test_cmd("USER John 0 * :John Smith\r\n");
-	manager->test_cmd("PASS password\r\n");
+	manager->test_cmd("PASS 1234\r\n");
 	manager->clear_queue();
 	//PASS
-	manager->test_cmd("PASS pass\r\n");
+	manager->test_cmd("PASS 1234\r\n");
 	cr_assert(!queue.empty(), "ERR_ALREADYREGISTERED: PASS: no answer");
 	cr_expect(queue.at(0) == "462 :Unauthorized command (already registered)\r\n", "ERR_ALREADYREGISTERED: PASS: answer contents");
 	cr_expect(queue.size() == 1, "ERR_ALREADYREGISTERED: PASS: too many answers");

@@ -5,11 +5,8 @@
 #include <string>
 #include "Client.hpp"
 #include "messages.hpp"
-#include <cstring>
-#include <string.h>
 
 void Client::nick(std::vector<std::string> args) {
-	//TODO: maybe register if only user is logged
 	if (args.size() != 1) {
 		this->send_msg(ERR_NONICKNAMEGIVEN);
 		return;
@@ -18,35 +15,35 @@ void Client::nick(std::vector<std::string> args) {
 		this->send_msg(ERR_NICKNAMEINUSE(args[0]));
 		return;
 	}
-//	if (!_user.is_registered) {
-//		_user.nickname = args[0];
-//		_user.username = args[0];
-//		_user.is_registered = true;
-//		_queue.push_back(RPL_WELCOME(_user.nickname, _user.username, _user.hostname));
-//	} else {
-		if (!_user.nickname.empty())
-			_queue.push_back(CH_NICK(_user.nickname, args[0]));
-//		else
-//			_queue.push_back(RPL_WELCOME(_user.nickname, _user.username, _user.hostname));
-		_user.nickname = args[0];
-//	}
+	if (!_user.nickname.empty()) {
+		_queue.push_back(CH_NICK(_user.nickname, args[0]));
+	}
+	_user.nickname = args[0];
+	if (_user.is_logged && !_user.username.empty() && !_user.wlc) {
+		_queue.push_back(RPL_WELCOME(_user.nickname, _user.username));
+		_user.wlc = true;
+		_user.is_registered = true;
+	}
 }
 
 void Client::userName(std::vector<std::string> args) {
-	//TODO: maybe register if only user is logged
 	if (_user.is_registered) {
 		this->send_msg(ERR_ALREADYREGISTERED);
 		return;
 	}
-	if (args.size() < 3) {
+	if (args.size() < 4) {
 		this->send_msg(ERR_NEEDMOREPARAMS("USER"));
 		return;
 	}
-	_user.is_registered = true;
 	_user.username = args[0];
-	_user.hostname = args[1];
-	_user.real_name = args[2];
-//	_queue.push_back(RPL_WELCOME(_user.username, _user.real_name, _user.hostname));
+	_user.mode = args[1];
+	_user.unused = args[2];
+	_user.real_name = args[3];
+	if (_user.is_logged && !_user.nickname.empty() && !_user.wlc) {
+		_queue.push_back(RPL_WELCOME(_user.nickname, _user.username));
+		_user.wlc = true;
+		_user.is_registered = true;
+	}
 }
 
 void Client::join(std::vector<std::string> args) {
@@ -95,6 +92,11 @@ void Client::pass(std::vector<std::string> args) {
 		return;
 	}
 
+	if (!_user.nickname.empty() && !_user.username.empty() && !_user.wlc) {
+		_queue.push_back(RPL_WELCOME(_user.nickname, _user.username));
+		_user.wlc = true;
+		_user.is_registered = true;
+	}
 	_user.is_logged = true;
 }
 

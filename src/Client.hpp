@@ -28,9 +28,12 @@ struct s_user {
 	std::string username;
 	std::string real_name;
 	std::string hostname;
+	std::string mode;
+	std::string unused;
 	bool		is_oper;
 	bool		is_registered;
 	bool		is_logged;
+	bool		wlc;
 	Channel *_channel;
 } typedef user;
 

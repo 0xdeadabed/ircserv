@@ -20,6 +20,7 @@ Client::Client(Server &serv, int connect_fd): _quit(false), _fd(connect_fd), _ad
 	_last_activity = std::time(NULL);
 	_user.is_registered = false;
 	_user.is_oper = false;
+	_user.wlc = false;
 }
 
 Client::Client(int listen_fd, Server &serv) : _quit(false), _addr(), _addr_len(), host(serv) {
@@ -33,6 +34,7 @@ Client::Client(int listen_fd, Server &serv) : _quit(false), _addr(), _addr_len()
 	_user.is_logged = false;
 	_user.is_oper = false;
 	_user._channel = NULL;
+	_user.wlc = false;
 }
 
 Client::Client(Client const &inst) : _quit(), _fd(), _addr(), _addr_len(), _last_activity(), host(inst.host) {
@@ -163,9 +165,9 @@ void Client::exec_cmd(const irc_cmd &cmd) {
 		case JOIN: join(cmd.args); break; //Done
 		case QUIT: quit(); break; //Done
 		case LIST: list(this); break; //Done
-		case PART: part(cmd.args); break; //DONE
-		case PRIVMSG: pmsg(cmd.args); break;
-		case CAP: cap(); break;
+		case PART: part(cmd.args); break; //Done
+		case PRIVMSG: pmsg(cmd.args); break; //Done
+		case CAP: cap(); break; // Done
 		case UNKNOWN:
 			_queue.push_back(ERR_UNKNOWNCOMMAND(cmd.cmd));
 			break;
