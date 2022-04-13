@@ -7,6 +7,8 @@
 #include "messages.hpp"
 
 void Client::nick(std::vector<std::string> args) {
+	if (!_user.is_logged)
+		return;
 	if (args.size() != 1) {
 		this->send_msg(ERR_NONICKNAMEGIVEN);
 		return;
@@ -27,6 +29,8 @@ void Client::nick(std::vector<std::string> args) {
 }
 
 void Client::userName(std::vector<std::string> args) {
+	if (!_user.is_logged)
+		return;
 	if (_user.is_registered) {
 		this->send_msg(ERR_ALREADYREGISTERED);
 		return;

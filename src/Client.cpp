@@ -148,8 +148,14 @@ void Client::parse_cmd(std::string str, irc_cmd *cmd) {
 	} else {
 		cmd->origin = ip_address;
 	}
-	cmd->cmd = str.substr(0, str.find(' '));
-	str.erase(0, str.find(' ') + 1);
+	size_t n = str.find(' ');
+	cmd->cmd = str.substr(0, n);
+	if (n == std::string::npos){
+		if (!last_arg.empty())
+			cmd->args.push_back(last_arg);
+		return;
+	}
+	str.erase(0, n + 1);
 	if (str.find(':') != std::string::npos) {
 		last_arg = str.substr(str.find(':') + 1);
 		str.erase(str.find(':'), std::string::npos);
