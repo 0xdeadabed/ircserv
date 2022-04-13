@@ -3,10 +3,15 @@
 //
 
 #include "Server.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 
 int main(int argc, char **argv){
-	
+
+#if defined(IRC_LOG) or defined(IRC_LOG_FILE)
+	std::ofstream log;
+	log.open("irc_log", std::ios::out | std::ios::trunc);
+	log.close();
+#endif
 	if (argc != 3){
 		std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
 		return 1;

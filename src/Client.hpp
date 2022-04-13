@@ -13,13 +13,46 @@
 #include "poll.h"
 #include "Channel.hpp"
 #include "Server.hpp"
+#include <fstream>
 
 
 class Server;
 //class Channel;
 
-
 #define READ_LEN 1024
+#ifdef IRC_LOG
+#define log_sent(msg) { \
+	std::time_t result = std::time(NULL); \
+	std::cout << " <<< " << std::asctime(std::localtime(&result)) << "dest:" << ip_address << "\nsent:" << (msg) << std::flush; \
+}
+#elif defined(IRC_LOG_FILE)
+#define log_sent(msg) { \
+	std::time_t result = std::time(NULL); \
+    std::ofstream file; \
+	file.open("irc_log", std::ios::out | std::ios::app);\
+	file << " <<< " << std::asctime(std::localtime(&result)) << "dest:" << ip_address << "\nsent:" << (msg) << std::flush; \
+	file.close();\
+}
+#else
+#define log_sent(msg)
+#endif
+
+#ifdef IRC_LOG
+#define log_received(msg) { \
+	std::time_t result = std::time(NULL); \
+	std::cout << " >>> " << std::asctime(std::localtime(&result)) << "origin:" << ip_address << "\nreceived:" << (msg) << std::flush; \
+}
+#elif defined(IRC_LOG_FILE)
+#define log_received(msg) { \
+	std::time_t result = std::time(NULL); \
+    std::ofstream file; \
+	file.open("irc_log", std::ios::out | std::ios::app);\
+	file << " >>> " << std::asctime(std::localtime(&result)) << "origin:" << ip_address << "\nreceived:" << (msg) << std::flush; \
+	file.close();\
+}
+#else
+#define log_received(msg)
+#endif
 
 typedef std::vector<pollfd>::iterator cpiterator;
 
