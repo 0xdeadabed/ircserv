@@ -108,7 +108,7 @@ private:
 	void	list(Client *c);
 	void	part(std::vector<std::string> args);
 	void	pmsg(std::vector<std::string> args);
-	void	cap();
+	void	cap() { return;};
 
 };
 
