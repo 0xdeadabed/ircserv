@@ -24,10 +24,14 @@ Client::Client(Server &serv, int connect_fd): _quit(false), _fd(connect_fd), _ad
 }
 
 Client::Client(int listen_fd, Server &serv) : _quit(false), _addr(), _addr_len(), host(serv) {
+	_addr_len = sizeof(_addr);
+	std::memset(&_addr, 0, _addr_len);
 	_fd = accept(listen_fd, (sockaddr *) &_addr, &_addr_len);
 	if (_fd < 0)
 		throw std::runtime_error("Error: couldn't connect a client");
-	ip_address = inet_ntoa(_addr.sin_addr);
+	char buff[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &_addr.sin_addr, buff, INET_ADDRSTRLEN);
+	ip_address = buff;
 	_buffer = std::string();
 	_last_activity = std::time(NULL);
 	_user.is_registered = false;
@@ -91,6 +95,7 @@ void Client::send_out() {
 	if (this->_queue.empty())
 		return;
 	send(this->_fd, &(this->_queue[0][0]), this->_queue[0].size(), MSG_DONTWAIT);
+	log_sent(_queue[0]);
 	this->_queue.erase(this->_queue.begin());
 }
 
@@ -104,6 +109,7 @@ void Client::check_buff() {
 		else
 			temp = _buffer.substr(0, pos);
 		_buffer.erase(0, pos + 2);
+		log_received(temp + "\r\n");
 		this->manage_command(temp);
 	}
 }
