@@ -88,8 +88,11 @@ void Server::loop() {
 			if (it == _watchlist.begin() && (it->revents & POLLIN) == POLLIN) {
 				add_client();
 				break;
-			} else if (it->revents) {
-				_clients.at(it->fd)->manage_events(it->revents);
+			} else {
+				if (it->revents) {
+					_clients.at(it->fd)->manage_events(it->revents);
+				}
+				_clients.at(it->fd)->check_buff();
 			}
 		}
 		this->disconnect_timeouts();

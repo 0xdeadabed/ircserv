@@ -47,6 +47,7 @@ Client::Client(Client const &inst) : _quit(), _fd(), _addr(), _addr_len(), _last
 
 Client::~Client() {
 	close(_fd);
+	log_else("closing client buff state:[" + _buffer + "]\n");
 	//delete _user._channel;
 }
 
@@ -70,7 +71,6 @@ int Client::get_fd() const {
 void Client::manage_events(short revents) {
 	if (revents & POLLIN && !this->_quit) {
 		Client::read_inp();
-		Client::check_buff();
 	}
 	if (revents & POLLOUT && !this->_queue.empty())
 		Client::send_out();
@@ -102,7 +102,7 @@ void Client::send_out() {
 void Client::check_buff() {
 	size_t pos;
 	std::string temp;
-	//todo change
+
 	if ((pos = _buffer.find("\r\n")) != std::string::npos) {
 		if (pos == 0)
 			temp = "";
@@ -110,6 +110,7 @@ void Client::check_buff() {
 			temp = _buffer.substr(0, pos);
 		_buffer.erase(0, pos + 2);
 		log_received(temp + "\r\n");
+//		log_else("buff state:[" + _buffer + "]\n");
 		this->manage_command(temp);
 	}
 }

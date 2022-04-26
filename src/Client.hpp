@@ -23,14 +23,14 @@ class Server;
 #ifdef IRC_LOG
 #define log_sent(msg) { \
 	std::time_t result = std::time(NULL); \
-	std::cout << " <<< " << std::asctime(std::localtime(&result)) << "dest:" << ip_address << "\nsent:" << (msg) << std::flush; \
+	std::cout << " <<< " << std::asctime(std::localtime(&result)) << "dest:" << ip_address << "\nsent: " << (msg) << std::flush; \
 }
 #elif defined(IRC_LOG_FILE)
 #define log_sent(msg) { \
 	std::time_t result = std::time(NULL); \
     std::ofstream file; \
 	file.open("irc_log", std::ios::out | std::ios::app);\
-	file << " <<< " << std::asctime(std::localtime(&result)) << "dest:" << ip_address << "\nsent:" << (msg) << std::flush; \
+	file << " <<< " << std::asctime(std::localtime(&result)) << "dest:" << ip_address << "\nsent: " << (msg) << std::flush; \
 	file.close();\
 }
 #else
@@ -40,18 +40,35 @@ class Server;
 #ifdef IRC_LOG
 #define log_received(msg) { \
 	std::time_t result = std::time(NULL); \
-	std::cout << " >>> " << std::asctime(std::localtime(&result)) << "origin:" << ip_address << "\nreceived:" << (msg) << std::flush; \
+	std::cout << " >>> " << std::asctime(std::localtime(&result)) << "origin:" << ip_address << "\nreceived: " << (msg) << std::flush; \
 }
 #elif defined(IRC_LOG_FILE)
 #define log_received(msg) { \
 	std::time_t result = std::time(NULL); \
     std::ofstream file; \
 	file.open("irc_log", std::ios::out | std::ios::app);\
-	file << " >>> " << std::asctime(std::localtime(&result)) << "origin:" << ip_address << "\nreceived:" << (msg) << std::flush; \
+	file << " >>> " << std::asctime(std::localtime(&result)) << "origin:" << ip_address << "\nreceived: " << (msg) << std::flush; \
 	file.close();\
 }
 #else
 #define log_received(msg)
+#endif
+
+#ifdef IRC_LOG
+#define log_else(msg) { \
+	std::time_t result = std::time(NULL); \
+	std::cout << " >>> " << std::asctime(std::localtime(&result)) << "client fd:" << _fd << "\nlog: " << (msg) << std::flush; \
+}
+#elif defined(IRC_LOG_FILE)
+#define log_else(msg) { \
+	std::time_t result = std::time(NULL); \
+    std::ofstream file; \
+	file.open("irc_log", std::ios::out | std::ios::app);\
+	file << " >>> " << std::asctime(std::localtime(&result)) << "client fd:" << _fd << "\nlog: " << (msg) << std::flush; \
+	file.close();\
+}
+#else
+#define log_else(msg)
 #endif
 
 typedef std::vector<pollfd>::iterator cpiterator;
@@ -95,6 +112,8 @@ public:
 
 	time_t get_last_activity() const;
 
+	void	check_buff();
+
 private:
 	friend class TestManager;
 
@@ -124,7 +143,7 @@ private:
 
 	void	read_inp();
 	void	send_out();
-	void	check_buff();
+
 	void	manage_command(const std::string& cmd);
 	void	parse_cmd(std::string str, irc_cmd *cmd);
 	void	exec_cmd(const irc_cmd &cmd);
