@@ -15,6 +15,9 @@
 #include "Client.hpp"
 #include "irc_cmd.h"
 
+#define IRC_PING_DELAY 60
+#define IRC_DISCONNECT_DELAY 150
+
 # ifndef IRC_SERV_PORT
 # 	define IRC_SERV_PORT 6697
 # endif
@@ -36,7 +39,9 @@ public:
 	Channel		*create_channel(const std::string &name, const std::string &password, Client *client);
 	Channel		*getChannels(const std::string &name);
 	Client		*getClient(const std::string &nickname);
-	std::string	getPass() const { return _password; };
+	std::string	getPass() const { return _password; }; //todo clean
+	std::string getAddress() const;
+
 private:
 	friend class TestManager;
 
@@ -46,6 +51,7 @@ private:
 	const int			_port;
 	const std::string	_password;
 	struct sockaddr_in	_server_address;
+	std::string			ip_address;
 	std::vector<struct pollfd> _watchlist;
 	std::map<int, Client *> _clients;
 	std::vector<Channel *> _channels;

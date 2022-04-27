@@ -101,8 +101,9 @@ public:
 
 	Channel	*getChannel() { return _user._channel; }
 	int get_fd() const;
-	std::string getNickname() const { return _user.nickname; };
+	std::string getNickname() const { return _user.nickname; }; //todo clean
 	std::string	getUsername() const { return _user.username; };
+	std::string	getAddress() const;
 	void send_msg(const std::string &msg);
 	void manage_events(short revents);
 
@@ -110,9 +111,10 @@ public:
 	bool is_queue_empty();
 	bool _quit;
 
-	time_t get_last_activity() const;
-
-	void	check_buff();
+	time_t	get_last_activity() const;
+	time_t	get_last_ping() const;
+	void	set_last_ping(std::time_t ping);
+	void	set_last_activity(std::time_t act);
 
 private:
 	friend class TestManager;
@@ -124,6 +126,7 @@ private:
 	user _user;
 	std::string _buffer;
 	std::time_t _last_activity;
+	std::time_t _last_ping;
 	std::vector<std::string> _queue;
 	Server &host;
 
@@ -138,6 +141,10 @@ private:
 		PART,
 		PRIVMSG,
 		CAP,
+		PING,
+		PONG,
+		MODE,
+		WHOIS,
 		UNKNOWN
 	};
 
@@ -146,6 +153,7 @@ private:
 
 	void	manage_command(const std::string& cmd);
 	void	parse_cmd(std::string str, irc_cmd *cmd);
+	void	check_buff();
 	void	exec_cmd(const irc_cmd &cmd);
 	static	irc_command get_cmd_id(const std::string &cmd);
 	void	joinChannel(Channel *channel);
@@ -160,7 +168,9 @@ private:
 	void	list(Client *c);
 	void	part(std::vector<std::string> args);
 	void	pmsg(std::vector<std::string> args);
-	void	cap() { return;};
+	void	cap() { return;}; //todo better
+	void	ping(std::vector<std::string> args);
+	void	pong(std::vector<std::string> args);
 
 };
 

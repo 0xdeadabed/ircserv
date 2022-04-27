@@ -21,6 +21,9 @@ Server::Server():
 	_server_address.sin_family = AF_INET;
 	_server_address.sin_addr.s_addr = htonl(INADDR_ANY);
 	_server_address.sin_port = htons((_port));
+
+	ip_address = "127.0.0.1";
+
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
 	_clients = std::map<int, Client *>();
@@ -42,6 +45,9 @@ Server::Server(const int &port, const std::string &password):
 		throw std::runtime_error("bind error");
 	if (listen(listen_fd.fd, 10) < 0)
 		throw std::runtime_error("listen error");
+
+	//todo change"?
+	ip_address = "127.0.0.1";
 
 	_watchlist = std::vector<struct pollfd>();
 	_watchlist.push_back(listen_fd);
@@ -89,10 +95,8 @@ void Server::loop() {
 				add_client();
 				break;
 			} else {
-				if (it->revents) {
+				if (it->revents)
 					_clients.at(it->fd)->manage_events(it->revents);
-				}
-				_clients.at(it->fd)->check_buff();
 			}
 		}
 		this->disconnect_timeouts();
@@ -113,20 +117,18 @@ void Server::add_client() {
 }
 
 void Server::disconnect_timeouts() {
-	std::time_t timestamp = std::time(nullptr);
+	std::time_t timestamp = std::time(NULL);
 
 	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end();) {
-		//todo define timestam
+		//todo define timestamp
 		if (!it->second->_quit
-			&& it->second->is_registered()
-			&& std::difftime(timestamp, it->second->get_last_activity()) > 600) {
+			&& std::difftime(timestamp, it->second->get_last_ping()) > IRC_PING_DELAY) {
+			it->second->set_last_ping(timestamp);
+			it->second->send_msg("PING " + it->second->getAddress() + "\r\n");
+		}
+		if (!it->second->_quit
+			&& std::difftime(timestamp, it->second->get_last_activity()) > IRC_DISCONNECT_DELAY) {
 			it->second->_quit = true;
-			it->second->send_msg(":ircserv@42lausanne.ch DISCONNECTED :disconnected by timeout, bye!");
-		} else if (!it->second->_quit
-				   && !it->second->is_registered()
-				   && std::difftime(timestamp, it->second->get_last_activity()) > 60) {
-			it->second->_quit = true;
-			it->second->send_msg(":ircserv@42lausanne.ch DISCONNECTED :disconnected by timeout and no registration");
 		}
 		if (it->second->_quit && it->second->is_queue_empty()) {
 			std::map<int, Client *>::iterator to_del = it;
@@ -183,4 +185,9 @@ Client *Server::getClient(const std::string &nickname) {
 			return it->second;
 	}
 	return NULL;
+}
+
+std::string Server::getAddress() const
+{
+	return ip_address;
 }

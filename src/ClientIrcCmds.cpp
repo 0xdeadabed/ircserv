@@ -154,3 +154,25 @@ void Client::pmsg(std::vector<std::string> args) {
 	//TODO no such name
 	this->send_msg(ERR_NOSUCHCHANNEL(args[0]));
 }
+
+void	Client::ping(std::vector<std::string> args)
+{
+	if (args.empty()){
+		this->send_msg(ERR_NOORIGIN);
+		return;
+	}
+	if (args[0] != this->host.getAddress()){
+		this->send_msg(ERR_NOSUCHSERVER(args[0]));
+		return;
+	}
+	this->send_msg("PONG " + this->host.getAddress() + "\r\n");
+}
+
+void	Client::pong(std::vector<std::string> args)
+{
+	if (args.empty()){
+		this->send_msg(ERR_NOORIGIN);
+		return;
+	}
+	this->set_last_activity(std::time(NULL));
+}

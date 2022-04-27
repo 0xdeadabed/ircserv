@@ -31,7 +31,7 @@ Client::Client(int listen_fd, Server &serv) : _quit(false), _addr(), _addr_len()
 		throw std::runtime_error("Error: couldn't connect a client");
 	char buff[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &_addr.sin_addr, buff, INET_ADDRSTRLEN);
-	ip_address = buff;
+	ip_address = std::string(buff);
 	_buffer = std::string();
 	_last_activity = std::time(NULL);
 	_user.is_registered = false;
@@ -71,6 +71,7 @@ int Client::get_fd() const {
 void Client::manage_events(short revents) {
 	if (revents & POLLIN && !this->_quit) {
 		Client::read_inp();
+		Client::check_buff();
 	}
 	if (revents & POLLOUT && !this->_queue.empty())
 		Client::send_out();
@@ -103,37 +104,25 @@ void Client::check_buff() {
 	size_t pos;
 	std::string temp;
 
-	if ((pos = _buffer.find("\r\n")) != std::string::npos) {
+	while ((pos = _buffer.find("\r\n")) != std::string::npos) {
 		if (pos == 0)
 			temp = "";
 		else
 			temp = _buffer.substr(0, pos);
 		_buffer.erase(0, pos + 2);
 		log_received(temp + "\r\n");
-//		log_else("buff state:[" + _buffer + "]\n");
 		this->manage_command(temp);
 	}
 }
 
 void Client::manage_command(const std::string& cmd) {
-//	std::string answer;
 	irc_cmd parsed_cmd;
-
-//	std::cout << cmd << "|";
 
 	if (cmd.empty())
 		return;
 	this->parse_cmd(cmd, &parsed_cmd);
 
 	this->exec_cmd(parsed_cmd);
-
-//	answer.append("origin: " + parsed_cmd.origin + "\nCMD: " + parsed_cmd.cmd + "\nargs:");
-//	for (int i = 0; i < (int) parsed_cmd.args.size(); i++) {
-//		answer.append("\n[" + std::to_string(i) + "]" + parsed_cmd.args[i] + "|");
-//	}
-//	answer.append("\n");
-//	std::cout << answer << std::endl;
-//	_queue.push_back(answer);
 }
 
 static void split(std::string str, std::vector<std::string> *args) {
@@ -183,11 +172,13 @@ void Client::exec_cmd(const irc_cmd &cmd) {
 		case PART: part(cmd.args); break; //Done
 		case PRIVMSG: pmsg(cmd.args); break; //Done
 		case CAP: cap(); break; // Done
+		case PING: ping(cmd.args); break;
+		case PONG: pong(cmd.args); break;
 		case UNKNOWN:
 			_queue.push_back(ERR_UNKNOWNCOMMAND(cmd.cmd));
 			break;
 		default:
-			std::cout << "dropped command" << std::endl;
+			std::cout << "dropped command " << cmd.cmd << std::endl;
 	}
 }
 
@@ -210,6 +201,14 @@ Client::irc_command Client::get_cmd_id(const std::string &cmd) {
 		return PRIVMSG;
 	if (cmd == "CAP")
 		return CAP;
+	if (cmd == "PING")
+		return PING;
+	if (cmd == "PONG")
+		return PONG;
+	if (cmd == "MODE")
+		return MODE;
+	if (cmd == "WHOIS")
+		return WHOIS;
 	return UNKNOWN;
 }
 
@@ -219,6 +218,18 @@ bool Client::is_registered() const {
 
 std::time_t Client::get_last_activity() const {
 	return _last_activity;
+}
+
+std::time_t Client::get_last_ping() const {
+	return _last_ping;
+}
+
+void	Client::set_last_activity(std::time_t act) {
+	_last_activity = act;
+}
+
+void	Client::set_last_ping(std::time_t ping) {
+	_last_ping = ping;
 }
 
 void Client::send_msg(const std::string &msg) {
@@ -249,4 +260,8 @@ void	Client::leaveChannel() {
 		return;
 
 	_user._channel->removeUser(this);
+}
+
+std::string	Client::getAddress() const{
+	return ip_address;
 }

@@ -20,6 +20,8 @@
 #define ERR_NOSUCHCHANNEL(channel)				"403 " + channel + " :No such channel\r\n"
 #define ERR_NOTONCHANNEL(channel)				"442 " + channel + " :You're not on that channel \n"
 #define ERR_UNKNOWNCOMMAND(command)				"421 " + command + " :Unknown command\r\n"
+#define ERR_NOORIGIN							"409 :No origin specified\r\n"
+#define ERR_NOSUCHSERVER(serv_addr)				"402 " + serv_addr + " :No such server\r\n"
 
 
 #endif //IRCSERV_MESSAGES_HPP
