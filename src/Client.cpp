@@ -68,6 +68,11 @@ int Client::get_fd() const {
 	return _fd;
 }
 
+// Getters
+std::string Client::getPrefix() const {
+	return _user.nickname + (_user.username.empty() ? "" : "!" + _user.username) + (_user.hostname.empty() ? "" : "@" + _user.hostname);
+}
+
 void Client::manage_events(short revents) {
 	if (revents & POLLIN && !this->_quit) {
 		Client::read_inp();

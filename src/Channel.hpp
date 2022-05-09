@@ -27,7 +27,7 @@ public:
 	std::string	getName();
 	std::vector<std::string> getNicknames();
 	void	addUser(Client *user);
-	void	sendMessage(std::string const &message);
+	void	sendMessage(std::string const &message, Client *sender);
 	void	removeUser(Client *client);
 	std::string getPassword() const { return _password; };
 

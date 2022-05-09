@@ -104,6 +104,7 @@ public:
 	std::string getNickname() const { return _user.nickname; }; //todo clean
 	std::string	getUsername() const { return _user.username; };
 	std::string	getAddress() const;
+	std::string getPrefix() const;
 	void send_msg(const std::string &msg);
 	void manage_events(short revents);
 

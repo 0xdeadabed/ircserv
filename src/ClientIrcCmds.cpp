@@ -36,7 +36,7 @@ void Client::userName(std::vector<std::string> args) {
 		return;
 	}
 	if (args.size() < 4) {
-		this->send_msg(ERR_NEEDMOREPARAMS("USER"));
+		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "USER"));
 		return;
 	}
 	_user.username = args[0];
@@ -57,7 +57,7 @@ void Client::join(std::vector<std::string> args) {
 	}
 
 	if (args.empty()) {
-		this->send_msg(ERR_NEEDMOREPARAMS("JOIN"));
+		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "JOIN"));
 		return;
 	}
 
@@ -87,7 +87,7 @@ void Client::pass(std::vector<std::string> args) {
 	}
 
 	if (args.empty()) {
-		this->send_msg(ERR_NEEDMOREPARAMS("PASS"));
+		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "PASS"));
 		return;
 	}
 
@@ -110,14 +110,14 @@ void Client::list(Client *c) {
 
 void	Client::part(std::vector<std::string> args) {
 	if (args.empty()) {
-		this->send_msg(ERR_NEEDMOREPARAMS("PART"));
+		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "PART"));
 		return;
 	}
 	std::string	channel_name = args[0];
 
 	Channel	*channel = host.getChannels(channel_name);
 	if (!channel) {
-		this->send_msg(ERR_NOSUCHCHANNEL(channel_name));
+		this->send_msg(ERR_NOSUCHCHANNEL(this->getNickname(), channel_name));
 		return;
 	}
 	if (!this->getChannel() || this->getChannel()->getName() != channel_name) {
@@ -129,30 +129,36 @@ void	Client::part(std::vector<std::string> args) {
 }
 
 void Client::pmsg(std::vector<std::string> args) {
-	if (args.size() < 2) {
-		this->send_msg(ERR_NEEDMOREPARAMS("PRIVMSG"));
+	if (args.size() < 2 || args[0].empty() || args[0].empty()) {
+		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "PRIVMSG"));
 		return;
 	}
+	std::string target = args.at(0);
 	std::string message;
-	for (std::vector<std::string>::iterator it = args.begin() + 1; it != args.end(); it++)
+
+	for (std::vector<std::string>::iterator it = args.begin() + 1; it != args.end(); it++) {
 		message.append(*it + " ");
-	message.append("\n");
-	if (args[0][0] == '#') {
-		Channel *channel;
-		if ((channel = this->getChannel()) != NULL) {
-			channel->sendMessage(message);
-			return;
-		}
-		this->send_msg(ERR_NOSUCHCHANNEL(args[0]));
 	}
 
-	Client *dst;
-	if ((dst = host.getClient(args[0])) != NULL) {
-		dst->send_msg(message);
+	message = message.at(0) == ':' ? message.substr(1) : message;
+	message.append("\n");
+
+	if (target.at(0) == '#') {
+		Channel *channel = this->getChannel();
+		if (!channel) {
+			this->send_msg(ERR_NOSUCHCHANNEL(this->getNickname(), target));
+			return;
+		}
+		channel->sendMessage(CNF_PRIVMSG(this->getPrefix(), target, message), this);
 		return;
 	}
-	//TODO no such name
-	this->send_msg(ERR_NOSUCHCHANNEL(args[0]));
+
+	Client *dest = host.getClient(target);
+	if (!dest) {
+		this->send_msg(ERR_NOSUCHNICK(this->getNickname(), target));
+		return;
+	}
+	dest->send_msg(CNF_PRIVMSG(this->getPrefix(), target, message));
 }
 
 void	Client::ping(std::vector<std::string> args)
