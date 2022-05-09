@@ -55,7 +55,7 @@ void Channel::sendMessage(std::string const &message, Client *sender) {
 	for (ch_it it = _members.begin(); it != _members.end(); it++)
 	{
 		if (*it == sender)
-			continue:
+			continue;
 		(*it)->send_msg(message);
 	}
 }

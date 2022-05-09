@@ -250,7 +250,7 @@ void Client::joinChannel(Channel *channel) {
 	channel->addUser(this);
 	_user._channel = channel;
 
-	channel->sendMessage(RPL_JOIN(_user.nickname, channel->getName()));
+	channel->sendMessage(CNF_JOIN(_user.nickname, channel->getName()), NULL);
 
 	std::string admins;
 	std::vector<std::string> nicknames = channel->getNicknames();
