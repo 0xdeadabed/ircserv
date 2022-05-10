@@ -19,12 +19,12 @@
 #define ERR_NOSUCHCHANNEL(source, channel)				"403 " + source + " " + channel + " :No such channel\r\n"
 #define ERR_NOSUCHNICK(source, target) "401" + source + " " + target + ":No such nick/channel\r\n"
 #define ERR_NOTONCHANNEL(channel)				"442 " + channel + " :You're not on that channel \n"
-#define ERR_UNKNOWNCOMMAND(command)				"421 " + command + " :Unknown command\r\n"
+#define ERR_UNKNOWNCOMMAND(source, command)				"421 " + source + " " + command + " :Unknown command\r\n"
 #define ERR_NOORIGIN							"409 :No origin specified\r\n"
 #define ERR_NOSUCHSERVER(serv_addr)				"402 " + serv_addr + " :No such server\r\n"
 
 // Confirmation
-#define CNF_JOIN(client, channel)				":" + client + " JOIN " + channel + "\r\n"
+#define CNF_JOIN(client, channel)				":" + client + " JOIN :" + channel + "\r\n"
 #define CNF_PRIVMSG(source, target, message) ":" + source + "PRIVMSG " + target + " :" + message
 
 #endif //IRCSERV_MESSAGES_HPP

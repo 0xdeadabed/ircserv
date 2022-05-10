@@ -180,7 +180,7 @@ void Client::exec_cmd(const irc_cmd &cmd) {
 		case PING: ping(cmd.args); break;
 		case PONG: pong(cmd.args); break;
 		case UNKNOWN:
-			_queue.push_back(ERR_UNKNOWNCOMMAND(cmd.cmd));
+			_queue.push_back(ERR_UNKNOWNCOMMAND(this->getNickname(), cmd.cmd));
 			break;
 		default:
 			std::cout << "dropped command " << cmd.cmd << std::endl;
