@@ -29,7 +29,7 @@ class Server;
 #define log_sent(msg) { \
 	std::time_t result = std::time(NULL); \
     std::ofstream file; \
-	file.open("irc_log", std::ios::out | std::ios::app);\
+	file.open("irc_log.txt", std::ios::out | std::ios::app);\
 	file << " <<< " << std::asctime(std::localtime(&result)) << "dest:" << ip_address << "\nsent: " << (msg) << std::flush; \
 	file.close();\
 }
@@ -46,7 +46,7 @@ class Server;
 #define log_received(msg) { \
 	std::time_t result = std::time(NULL); \
     std::ofstream file; \
-	file.open("irc_log", std::ios::out | std::ios::app);\
+	file.open("irc_log.txt", std::ios::out | std::ios::app);\
 	file << " >>> " << std::asctime(std::localtime(&result)) << "origin:" << ip_address << "\nreceived: " << (msg) << std::flush; \
 	file.close();\
 }
@@ -63,7 +63,7 @@ class Server;
 #define log_else(msg) { \
 	std::time_t result = std::time(NULL); \
     std::ofstream file; \
-	file.open("irc_log", std::ios::out | std::ios::app);\
+	file.open("irc_log.txt", std::ios::out | std::ios::app);\
 	file << " >>> " << std::asctime(std::localtime(&result)) << "client fd:" << _fd << "\nlog: " << (msg) << std::flush; \
 	file.close();\
 }

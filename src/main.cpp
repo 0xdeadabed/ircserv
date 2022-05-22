@@ -7,9 +7,9 @@
 
 int main(int argc, char **argv){
 
-#if defined(IRC_LOG) or defined(IRC_LOG_FILE)
+#if defined(IRC_LOG_FILE)
 	std::ofstream log;
-	log.open("irc_log", std::ios::out | std::ios::trunc);
+	log.open("irc_log.txt", std::ios::out | std::ios::trunc);
 	log.close();
 #endif
 	if (argc != 3){

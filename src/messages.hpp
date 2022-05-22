@@ -25,6 +25,6 @@
 
 // Confirmation
 #define CNF_JOIN(client, channel)				":" + client + " JOIN :" + channel + "\r\n"
-#define CNF_PRIVMSG(source, target, message) ":" + source + "PRIVMSG " + target + " :" + message
+#define CNF_PRIVMSG(source, target, message)	":" + source + "PRIVMSG " + target + " :" + message
 
 #endif //IRCSERV_MESSAGES_HPP

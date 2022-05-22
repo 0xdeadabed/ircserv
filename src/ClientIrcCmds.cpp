@@ -122,7 +122,7 @@ void	Client::part(std::vector<std::string> args) {
 }
 
 void Client::pmsg(std::vector<std::string> args) {
-	if (args.size() < 2 || args[0].empty() || args[0].empty()) {
+	if (args.size() < 2 || args[0].empty()) {
 		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "PRIVMSG"));
 		return;
 	}
