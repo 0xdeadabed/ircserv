@@ -272,6 +272,9 @@ void	Client::leaveChannel() {
 	_user._channel->removeUser(this);
 }
 
+std::string Client::getNickname() const { return _user.nickname; };
+std::string	Client::getUsername() const { return _user.username; };
+
 std::string	Client::getAddress() const{
 	return ip_address;
 }

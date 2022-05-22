@@ -29,6 +29,7 @@ public:
 	void	addUser(Client *user);
 	void	setAdmin(Client *admin);
 	bool	isAdmin(Client *client);
+	bool	isInChannel(Client *client);
 	void	sendMessage(std::string const &message, Client *sender);
 	void	removeUser(Client *client);
 	std::string getPassword() const { return _password; };

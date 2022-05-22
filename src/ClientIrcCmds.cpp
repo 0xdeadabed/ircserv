@@ -49,16 +49,20 @@ void Client::userName(std::vector<std::string> args) {
 }
 
 void Client::join(std::vector<std::string> args) {
-	std::string password = args.size() > 1 ? args[1] : "";
-	std::string channel_name = args[0];
-	Channel *channel = host.getChannels(channel_name);
-
 	if (args.empty()) {
 		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "JOIN"));
 		return;
 	}
-	if (!channel)
+
+	std::string password = args.size() > 1 ? args[1] : "";
+	std::string channel_name = args[0];
+	Channel *channel = host.getChannels(channel_name);
+
+	if (!channel) {
 		channel = host.create_channel(channel_name, password, this);
+	}
+	if (channel->isInChannel(this))
+		return;
 	if (channel->getPassword() != password) {
 		this->send_msg(ERR_BADCHANNELKEY(args[0]));
 		return;

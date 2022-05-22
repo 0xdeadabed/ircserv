@@ -101,8 +101,8 @@ public:
 
 	Channel	*getChannel() { return _user._channel; }
 	int get_fd() const;
-	std::string getNickname() const { return _user.nickname; }; //todo clean
-	std::string	getUsername() const { return _user.username; };
+	std::string getNickname() const;
+	std::string	getUsername() const;
 	std::string	getAddress() const;
 	std::string getPrefix() const;
 	void send_msg(const std::string &msg);

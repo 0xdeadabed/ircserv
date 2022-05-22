@@ -59,6 +59,13 @@ bool Channel::isAdmin(Client *client) {
 	return (client == _admin);
 }
 
+bool Channel::isInChannel(Client *client) {
+	for (ch_it it = _members.begin(); it != _members.end(); it++)
+		if (*it == client)
+			return true;
+	return false;
+}
+
 void Channel::sendMessage(std::string const &message, Client *sender) {
 	for (ch_it it = _members.begin(); it != _members.end(); it++)
 	{

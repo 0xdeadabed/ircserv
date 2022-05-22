@@ -17,13 +17,13 @@
 #define RPL_NAMREPLY(client, channels, admin)	"353 " + client + " = " + channels + " :" + admin + "\r\n"
 #define RPL_ENDOFNAMES(client, channel)			"366 " + client + " " + channel + " :End of /NAMES list.\r\n"
 #define ERR_NOSUCHCHANNEL(source, channel)		"403 " + source + " " + channel + " :No such channel\r\n"
-#define ERR_NOSUCHNICK(source, target)			"401" + source + " " + target + ":No such nick/channel\r\n"
+#define ERR_NOSUCHNICK(source, target)			"401 " + source + " " + target + ":No such nick/channel\r\n"
 #define ERR_NOTONCHANNEL(channel)				"442 " + channel + " :You're not on that channel \n"
 #define ERR_UNKNOWNCOMMAND(source, command)		"421 " + source + " " + command + " :Unknown command\r\n"
 #define ERR_NOORIGIN							"409 :No origin specified\r\n"
 #define ERR_NOSUCHSERVER(serv_addr)				"402 " + serv_addr + " :No such server\r\n"
 #define KICK_MSG(target, channel)				":" " Kick " + target + " from " + channel + "\r\n"
-#define ERR_CHANOPRIVSNEEDED(client, channel)	"482 " + client + " " + channel + " :You're not channel operator"
+#define ERR_CHANOPRIVSNEEDED(client, channel)	"482 " + client + " " + channel + " :You're not channel operator\r\n"
 
 // Confirmation
 #define CNF_JOIN(client, channel)				":" + client + " JOIN :" + channel + "\r\n"
