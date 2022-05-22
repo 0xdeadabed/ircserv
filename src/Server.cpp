@@ -176,6 +176,7 @@ void Server::listChannel(Client *c) {
 Channel *Server::create_channel(const std::string &name, const std::string &password, Client *client) {
 	Channel *channel = new Channel(name, password, client);
 	_channels.push_back(channel);
+	channel->setAdmin(client);
 	return channel;
 }
 

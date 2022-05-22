@@ -27,9 +27,12 @@ public:
 	std::string	getName();
 	std::vector<std::string> getNicknames();
 	void	addUser(Client *user);
+	void	setAdmin(Client *admin);
+	bool	isAdmin(Client *client);
 	void	sendMessage(std::string const &message, Client *sender);
 	void	removeUser(Client *client);
 	std::string getPassword() const { return _password; };
+	Client *getClient(std::string name);
 
 private:
 	std::string				_name;

@@ -51,6 +51,14 @@ void Channel::addUser(Client *user) {
 	}
 }
 
+void Channel::setAdmin(Client *admin) {
+	_admin = admin;
+}
+
+bool Channel::isAdmin(Client *client) {
+	return (client == _admin);
+}
+
 void Channel::sendMessage(std::string const &message, Client *sender) {
 	for (ch_it it = _members.begin(); it != _members.end(); it++)
 	{
@@ -75,4 +83,12 @@ void	Channel::removeUser(Client *client) {
 
 		//TODO send a message to everyone
 	}
+}
+
+Client *Channel::getClient(std::string name) {
+	for (ch_it it = _members.begin(); it != _members.end(); it++) {
+		if ((*it)->getUsername() == name)
+			return *it;
+	}
+	return NULL;
 }

@@ -84,7 +84,7 @@ struct s_user {
 	bool		is_registered;
 	bool		is_logged;
 	bool		wlc;
-	Channel *_channel;
+	Channel 	*_channel;
 } typedef user;
 
 class Client {
@@ -146,6 +146,7 @@ private:
 		PONG,
 		MODE,
 		WHOIS,
+		KICK,
 		UNKNOWN
 	};
 
@@ -172,6 +173,7 @@ private:
 	void	cap() { return;}; //todo better
 	void	ping(std::vector<std::string> args);
 	void	pong(std::vector<std::string> args);
+	void	kick(std::vector<std::string> args);
 
 };
 

@@ -181,6 +181,7 @@ void Client::exec_cmd(const irc_cmd &cmd) {
 		case CAP: cap(); break; // Done
 		case PING: ping(cmd.args); break;
 		case PONG: pong(cmd.args); break;
+		case KICK: kick(cmd.args); break;
 		case UNKNOWN:
 			_queue.push_back(ERR_UNKNOWNCOMMAND(this->getNickname(), cmd.cmd));
 			break;
@@ -216,6 +217,8 @@ Client::irc_command Client::get_cmd_id(const std::string &cmd) {
 		return MODE;
 	if (cmd == "WHOIS")
 		return WHOIS;
+	if (cmd == "KICK")
+		return KICK;
 	return UNKNOWN;
 }
 

@@ -49,14 +49,14 @@ void Client::userName(std::vector<std::string> args) {
 }
 
 void Client::join(std::vector<std::string> args) {
+	std::string password = args.size() > 1 ? args[1] : "";
+	std::string channel_name = args[0];
+	Channel *channel = host.getChannels(channel_name);
+
 	if (args.empty()) {
 		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "JOIN"));
 		return;
 	}
-
-	std::string password = args.size() > 1 ? args[1] : "";
-	std::string channel_name = args[0];
-	Channel *channel = host.getChannels(channel_name);
 	if (!channel)
 		channel = host.create_channel(channel_name, password, this);
 	if (channel->getPassword() != password) {
@@ -174,4 +174,27 @@ void	Client::pong(std::vector<std::string> args)
 		return;
 	}
 	this->set_last_activity(std::time(NULL));
+}
+
+void	Client::kick(std::vector<std::string> args)
+{
+	std::string	channel_name = args[0];
+	Channel *channel = host.getChannels(channel_name);
+	Client *target = channel->getClient(args[1]);
+
+	if (args.size() < 2) {
+		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "KICK"));
+		return;
+	}
+	if (!channel) {
+		this->send_msg(ERR_NOSUCHCHANNEL(this->getNickname(), channel_name));
+		return;
+	}
+	if (!channel->isAdmin(this))
+	{
+		this->send_msg(ERR_CHANOPRIVSNEEDED(this->getNickname(), channel_name));
+		return;
+	}
+	channel->sendMessage(KICK_MSG(args[1], channel_name), this);
+	channel->removeUser(target);
 }
