@@ -49,20 +49,22 @@ void Client::userName(std::vector<std::string> args) {
 }
 
 void Client::join(std::vector<std::string> args) {
+	std::string password;
+	std::string channel_name;
+	Channel *channel;
+
 	if (args.empty()) {
 		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "JOIN"));
 		return;
 	}
-
-	std::string password = args.size() > 1 ? args[1] : "";
-	std::string channel_name = args[0];
-	Channel *channel = host.getChannels(channel_name);
-
+	channel_name = args[0];
+	channel = host.getChannels(channel_name);
 	if (!channel) {
 		channel = host.create_channel(channel_name, password, this);
 	}
 	if (channel->isInChannel(this))
 		return;
+	password = args.size() > 1 ? args[1] : "";
 	if (channel->getPassword() != password) {
 		this->send_msg(ERR_BADCHANNELKEY(args[0]));
 		return;
@@ -126,35 +128,37 @@ void	Client::part(std::vector<std::string> args) {
 }
 
 void Client::pmsg(std::vector<std::string> args) {
+	std::string target;
+	std::string message;
+	Channel *channel;
+	Client *dest;
+
 	if (args.size() < 2 || args[0].empty()) {
 		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "PRIVMSG"));
 		return;
 	}
-	std::string target = args.at(0);
-	std::string message;
-
-	for (std::vector<std::string>::iterator it = args.begin() + 1; it != args.end(); it++) {
+	for (std::vector<std::string>::iterator it = args.begin() + 1; it != args.end(); it++)
 		message.append(*it + " ");
-	}
-
-	message = message.at(0) == ':' ? message.substr(1) : message;
-	message.append("\n");
-
+	target = args.at(0);
 	if (target.at(0) == '#') {
-		Channel *channel = this->getChannel();
+		channel = host.getChannels(target);
 		if (!channel) {
 			this->send_msg(ERR_NOSUCHCHANNEL(this->getNickname(), target));
 			return;
 		}
+		message = message.at(0) == ':' ? message.substr(1) : message;
+		message.append("\r\n");
 		channel->sendMessage(CNF_PRIVMSG(this->getPrefix(), target, message), this);
 		return;
 	}
 
-	Client *dest = host.getClient(target);
+	dest = host.getClient(target);
 	if (!dest) {
 		this->send_msg(ERR_NOSUCHNICK(this->getNickname(), target));
 		return;
 	}
+	message = message.at(0) == ':' ? message.substr(1) : message;
+	message.append("\r\n");
 	dest->send_msg(CNF_PRIVMSG(this->getPrefix(), target, message));
 }
 
@@ -182,14 +186,16 @@ void	Client::pong(std::vector<std::string> args)
 
 void	Client::kick(std::vector<std::string> args)
 {
-	std::string	channel_name = args[0];
-	Channel *channel = host.getChannels(channel_name);
-	Client *target = channel->getClient(args[1]);
+	std::string	channel_name;
+	Channel *channel;
+	Client *target;
 
 	if (args.size() < 2) {
 		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "KICK"));
 		return;
 	}
+	channel_name = args[0];
+	channel = host.getChannels(channel_name);
 	if (!channel) {
 		this->send_msg(ERR_NOSUCHCHANNEL(this->getNickname(), channel_name));
 		return;
@@ -197,6 +203,15 @@ void	Client::kick(std::vector<std::string> args)
 	if (!channel->isAdmin(this))
 	{
 		this->send_msg(ERR_CHANOPRIVSNEEDED(this->getNickname(), channel_name));
+		return;
+	}
+	target = channel->getClient(args[1]);
+	if (!target) {
+		this->send_msg(ERR_USERNOTINCHANNEL(args[1], channel_name));
+		return;
+	}
+	if (!channel->getClient(this->getUsername())) {
+		this->send_msg(ERR_NOTONCHANNEL(channel_name));
 		return;
 	}
 	channel->sendMessage(KICK_MSG(args[1], channel_name), this);

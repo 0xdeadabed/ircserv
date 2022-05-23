@@ -251,14 +251,13 @@ bool Client::is_queue_empty() {
 }
 
 void Client::joinChannel(Channel *channel) {
+	std::vector<std::string> nicknames;
+	std::string admins;
 
 	channel->addUser(this);
 	_user._channel = channel;
-
 	channel->sendMessage(CNF_JOIN(_user.nickname, channel->getName()), NULL);
-
-	std::string admins;
-	std::vector<std::string> nicknames = channel->getNicknames();
+	nicknames = channel->getNicknames();
 	for (std::vector<std::string>::iterator it = nicknames.begin(); it != nicknames.end(); it++)
 		admins.append(it.operator*() + " ");
 	this->send_msg(RPL_NAMREPLY(_user.nickname, channel->getName(), admins));
