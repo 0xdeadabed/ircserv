@@ -174,6 +174,7 @@ private:
 	void	ping(std::vector<std::string> args);
 	void	pong(std::vector<std::string> args);
 	void	kick(std::vector<std::string> args);
+	void	mode(std::vector<std::string> args);
 
 };
 

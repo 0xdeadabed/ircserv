@@ -182,6 +182,7 @@ void Client::exec_cmd(const irc_cmd &cmd) {
 		case PING: ping(cmd.args); break;
 		case PONG: pong(cmd.args); break;
 		case KICK: kick(cmd.args); break;
+		case MODE: mode(cmd.args); break;
 		case UNKNOWN:
 			_queue.push_back(ERR_UNKNOWNCOMMAND(this->getNickname(), cmd.cmd));
 			break;
@@ -271,8 +272,8 @@ void	Client::leaveChannel() {
 	_user._channel->removeUser(this);
 }
 
-std::string Client::getNickname() const { return _user.nickname; };
-std::string	Client::getUsername() const { return _user.username; };
+std::string Client::getNickname() const { return _user.nickname; }
+std::string	Client::getUsername() const { return _user.username; }
 
 std::string	Client::getAddress() const{
 	return ip_address;

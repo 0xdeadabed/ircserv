@@ -217,3 +217,13 @@ void	Client::kick(std::vector<std::string> args)
 	channel->sendMessage(KICK_MSG(args[1], channel_name), this);
 	channel->removeUser(target);
 }
+
+void Client::mode(std::vector<std::string> args)
+{
+	if (args.empty() || (*(args[0].begin()) != '#' && *(args[0].begin()) != '$'))
+		return;
+	if (host.getChannels(args[0]) != NULL)
+		this->send_msg(ERR_NOCHANMODES(args[0]));
+	else
+		this->send_msg(ERR_USERNOTINCHANNEL(this->getNickname(), args[0]));
+}
