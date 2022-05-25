@@ -31,4 +31,6 @@
 #define CNF_JOIN(client, channel)				":" + client + " JOIN :" + channel + "\r\n"
 #define CNF_PRIVMSG(source, target, message)	":" + source + " PRIVMSG " + target + " :" + message + "\r\n"
 
+#define ERR_NOCHANMODES(channel)				"477 " + channel + " :Channel doesn't support modes\r\n"
+
 #endif //IRCSERV_MESSAGES_HPP
