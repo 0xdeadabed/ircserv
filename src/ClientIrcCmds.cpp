@@ -69,6 +69,12 @@ void Client::join(std::vector<std::string> args) {
 		this->send_msg(ERR_BADCHANNELKEY(args[0]));
 		return;
 	}
+	if (channel->isMaxMode()) {
+		if (channel->getMaxSize() <= channel->getClientsNumber()){
+			channel->sendMessage(ERR_CHANNELISFULL(channel_name), this);
+			return;
+		}
+	}
 	this->joinChannel(channel);
 }
 
@@ -147,13 +153,7 @@ void Client::pmsg(std::vector<std::string> args) {
 			return;
 		}
 		if (channel->isNMode()){
-			std::vector<std::string>			nicknames(channel->getNicknames());
-			std::vector<std::string>::iterator	i;
-
-			for (i = nicknames.begin(); i != nicknames.end(); i++)
-				if (*i == this->getNickname())
-					break;
-			if (i == nicknames.end())
+			if (!channel->isInChannel(this))
 			{
 				this->send_msg(ERR_CANNOTSENDTOCHAN(this->getNickname(), target));
 				return;
@@ -231,6 +231,7 @@ void	Client::kick(std::vector<std::string> args)
 	channel->removeUser(target);
 }
 
+//TODO -> Reformat this code and make tests
 void Client::mode(std::vector<std::string> args)
 {
 	std::string	target;
@@ -269,20 +270,30 @@ void Client::mode(std::vector<std::string> args)
 				Client	*targetUser;
 				targetUser = channel->getClient(args[2]);
 				if (!targetUser)
+				{
+					this->send_msg(ERR_NOSUCHNICK(args[2], target));
 					return;
-				if (active) {
+				}
+				if (active)
 					channel->setOperator(targetUser);
-					channel->sendMessage(RPL_MODE(this->getPrefix(), channel->getName(), (active ? "+n" : "-n"), ""), this);
-				}
-				else {
+				else
 					channel->removeOperator(targetUser);
-					channel->sendMessage(RPL_MODE(this->getPrefix(), channel->getName(), (active ? "+n" : "-n"), ""), this);
-				}
+				channel->sendMessage(RPL_MODE(this->getPrefix(), channel->getName(), (active ? "+o" : "-o"), ""), this);
 				break;
 			}
 			case 'n': {
 				channel->setNMode(active);
 				channel->sendMessage(RPL_MODE(this->getPrefix(), channel->getName(), (active ? "+n" : "-n"), ""), this);
+				break;
+			}
+			case 'l': {
+				size_t	size;
+				if (active && args.size() == 3)
+					size = std::stol(args[2]);
+				else
+					size = 0;
+				channel->setMaxSize(active, size);
+				channel->sendMessage(RPL_MODE(this->getPrefix(), channel->getName(), (active ? "+l" : "-l"), ""), this);
 				break;
 			}
 			default:

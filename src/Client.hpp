@@ -107,9 +107,6 @@ public:
 	std::string	getPrefix() const;
 	void 		send_msg(const std::string &msg);
 	void 		manage_events(short revents);
-//	void		setOper();
-//	void		removeOper();
-//	bool		isOper();
 
 	bool is_registered() const;
 	bool is_queue_empty();

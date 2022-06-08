@@ -115,3 +115,20 @@ Client *Channel::getClient(std::string name) {
 	}
 	return NULL;
 }
+
+void	Channel::setMaxSize(bool con, size_t size = 0) {
+	this->_l_active = con;
+	this->_maxSize = size;
+}
+
+size_t	Channel::getMaxSize() {
+	return this->_maxSize;
+}
+
+size_t	Channel::getClientsNumber() {
+	return _members.size();
+}
+
+bool	Channel::isMaxMode() {
+	return this->_l_active;
+}

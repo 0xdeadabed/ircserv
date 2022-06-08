@@ -28,6 +28,7 @@
 #define ERR_USERNOTINCHANNEL(nick, channel)		"441 " + nick + " " + channel + " :They aren't on that channel\r\n"
 #define RPL_MODE(source, channel, modes, args)	":" + source + " MODE " + channel + " " + modes + " " + args + "\r\n"
 #define ERR_CANNOTSENDTOCHAN(source, channel)	"404 " + source + " " + channel + " :Cannot send to channel\r\n"
+#define ERR_CHANNELISFULL(channel)				"471 " + channel + " :Cannot join channel (+l)\r\n"
 
 // Confirmation
 #define CNF_JOIN(client, channel)				":" + client + " JOIN :" + channel + "\r\n"
