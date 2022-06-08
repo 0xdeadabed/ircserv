@@ -176,6 +176,8 @@ Channel *Server::create_channel(const std::string &name, const std::string &pass
 	Channel *channel = new Channel(name, password, client);
 	_channels.push_back(channel);
 	channel->setAdmin(client);
+	channel->setNMode(false);
+	channel->setMaxSize(false, 0);
 	return channel;
 }
 

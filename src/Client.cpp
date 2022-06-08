@@ -278,15 +278,3 @@ std::string	Client::getUsername() const { return _user.username; }
 std::string	Client::getAddress() const{
 	return ip_address;
 }
-
-//void	Client::setOper() {
-//	this->_user.is_oper = true;
-//}
-//
-//void	Client::removeOper() {
-//	this->_user.is_oper = false;
-//}
-//
-//bool	Client::isOper() {
-//	return this->_user.is_oper;
-//}

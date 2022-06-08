@@ -38,7 +38,10 @@ public:
 	Client 						*getClient(std::string name);
 	bool						isNMode() const { return _n; };
 	void						setNMode(bool n) { this->_n = n; };
-	void						setMaxClients(size_t l) { this->_l = l; };
+	void						setMaxSize(bool con, size_t size);
+	size_t 						getMaxSize();
+	size_t						getClientsNumber();
+	bool						isMaxMode();
 	void						setPassword(std::string k) { this->_k = k; };
 
 private:
@@ -50,7 +53,8 @@ private:
 
 	// Modes
 	std::string				_k;
-	size_t					_l;
+	size_t					_maxSize;
+	bool					_l_active;
 	bool					_n;
 };
 
