@@ -147,6 +147,7 @@ private:
 		MODE,
 		WHOIS,
 		KICK,
+		NOTICE,
 		UNKNOWN
 	};
 
@@ -175,6 +176,7 @@ private:
 	void	pong(std::vector<std::string> args);
 	void	kick(std::vector<std::string> args);
 	void	mode(std::vector<std::string> args);
+	void	notice(std::vector<std::string> args);
 
 };
 
