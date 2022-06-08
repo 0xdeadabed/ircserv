@@ -167,7 +167,6 @@ void Server::listChannel(Client *c) {
 
 	// Iterate over the channels and write them on the user.s fd
 	for (it = _channels.begin(); it != _channels.end(); it++) {
-		//std::cout << "client fd: " << c->get_fd() << std::endl;
 		send(c->get_fd(), (*it)->getName().c_str(), strlen((*it)->getName().c_str()), 0);
 		send(c->get_fd(), "\n", 1, 0);
 	}

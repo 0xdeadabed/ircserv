@@ -57,6 +57,7 @@ private:
 	std::vector<Channel *> _channels;
 
 	void 		add_client();
+	void 		add_bot();
 
 	void 		disconnect_timeouts();
 

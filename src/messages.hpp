@@ -26,6 +26,8 @@
 #define KICK_MSG(target, channel)				":" " Kick " + target + " from " + channel + "\r\n"
 #define ERR_CHANOPRIVSNEEDED(client, channel)	"482 " + client + " " + channel + " :You're not channel operator\r\n"
 #define ERR_USERNOTINCHANNEL(nick, channel)		"441 " + nick + " " + channel + " :They aren't on that channel\r\n"
+#define RPL_MODE(source, channel, modes, args)	":" + source + " MODE " + channel + " " + modes + " " + args + "\r\n"
+#define ERR_CANNOTSENDTOCHAN(source, channel)	"404 " + source + " " + channel + " :Cannot send to channel\r\n"
 
 // Confirmation
 #define CNF_JOIN(client, channel)				":" + client + " JOIN :" + channel + "\r\n"

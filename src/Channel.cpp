@@ -55,8 +55,26 @@ void Channel::setAdmin(Client *admin) {
 	_admin = admin;
 }
 
+void Channel::setOperator(Client *op) {
+	_operators.push_back(op);
+}
+
+void Channel::removeOperator(Client *client) {
+	_operators.erase(std::remove(_operators.begin(), _operators.end(), client), _operators.end());
+}
+
 bool Channel::isAdmin(Client *client) {
 	return (client == _admin);
+}
+
+bool Channel::isOperator(Client *client) {
+	if (_operators.empty())
+		return false;
+	for (ch_it it = _operators.begin(); it != _operators.end(); it++) {
+		if (*it == client)
+			return true;
+	}
+	return false;
 }
 
 bool Channel::isInChannel(Client *client) {
@@ -76,25 +94,23 @@ void Channel::sendMessage(std::string const &message, Client *sender) {
 }
 
 void	Channel::removeUser(Client *client) {
-	// A Bugy area
 	_members.erase(std::remove(_members.begin(), _members.end(), client), _members.end());
-//	for (ch_it it = _members.begin(); it != _members.end(); it++)
-//		if (client->getNickname() == (*it)->getNickname())
-//			_members.erase(it);
 
 	if (_members.empty())
 		return;
 
 	if (_admin == client) {
+		if (!_operators.empty()) {
+			_admin = _operators.begin().operator*();
+			return;
+		}
 		_admin = _members.begin().operator*();
-
-		//TODO send a message to everyone
 	}
 }
 
 Client *Channel::getClient(std::string name) {
 	for (ch_it it = _members.begin(); it != _members.end(); it++) {
-		if ((*it)->getUsername() == name)
+		if ((*it)->getUsername() == name || (*it)->getNickname() == name)
 			return *it;
 	}
 	return NULL;

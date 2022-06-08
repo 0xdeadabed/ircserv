@@ -13,7 +13,6 @@ class Client;
 class Channel;
 
 
-
 class Channel
 {
 	typedef	std::vector<Client *>::iterator	ch_it;
@@ -24,22 +23,35 @@ public:
 
 	Channel &operator=(Channel const &rhs);
 
-	std::string	getName();
-	std::vector<std::string> getNicknames();
-	void	addUser(Client *user);
-	void	setAdmin(Client *admin);
-	bool	isAdmin(Client *client);
-	bool	isInChannel(Client *client);
-	void	sendMessage(std::string const &message, Client *sender);
-	void	removeUser(Client *client);
-	std::string getPassword() const { return _password; };
-	Client *getClient(std::string name);
+	std::string					getName();
+	std::vector<std::string>	getNicknames();
+	void						addUser(Client *user);
+	void						setAdmin(Client *admin);
+	void						setOperator(Client *op);
+	void						removeOperator(Client *admin);
+	bool						isAdmin(Client *client);
+	bool						isOperator(Client *client);
+	bool						isInChannel(Client *client);
+	void						sendMessage(std::string const &message, Client *sender);
+	void						removeUser(Client *client);
+	std::string					getPassword() const { return _password; };
+	Client 						*getClient(std::string name);
+	bool						isNMode() const { return _n; };
+	void						setNMode(bool n) { this->_n = n; };
+	void						setMaxClients(size_t l) { this->_l = l; };
+	void						setPassword(std::string k) { this->_k = k; };
 
 private:
 	std::string				_name;
 	std::string				_password;
 	std::vector<Client *>	_members;
 	Client					*_admin;
+	std::vector<Client *>	_operators;
+
+	// Modes
+	std::string				_k;
+	size_t					_l;
+	bool					_n;
 };
 
 
