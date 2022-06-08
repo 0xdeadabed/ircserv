@@ -160,7 +160,6 @@ void Client::pmsg(std::vector<std::string> args) {
 			}
 		}
 		message = message.at(0) == ':' ? message.substr(1) : message;
-		message.append("\r\n");
 		channel->sendMessage(CNF_PRIVMSG(this->getPrefix(), target, message), this);
 		return;
 	}
@@ -171,7 +170,6 @@ void Client::pmsg(std::vector<std::string> args) {
 		return;
 	}
 	message = message.at(0) == ':' ? message.substr(1) : message;
-	message.append("\r\n");
 	dest->send_msg(CNF_PRIVMSG(this->getPrefix(), target, message));
 }
 
@@ -302,4 +300,34 @@ void Client::mode(std::vector<std::string> args)
 		i++;
 		modeChar = args[1][i];
 	}
+}
+
+void	Client::notice(std::vector<std::string> args) {
+	std::string	target;
+	std::string	message;
+	Channel *channel;
+	Client *dest;
+
+	if (args.size() < 2)
+		return;
+	for (std::vector<std::string>::iterator it = args.begin() + 1; it != args.end(); it++)
+		message.append(*it + " ");
+	message = message.at(0) == ':' ? message.substr(1) : message;
+	target = args.at(0);
+	if (target.at(0) == '#') {
+		channel = host.getChannels(target);
+		if (!channel)
+			return;
+		if (channel->isNMode())
+			if (!channel->isInChannel(this))
+				return;
+		message = message.at(0) == ':' ? message.substr(1) : message;
+		channel->sendMessage(CNF_PRIVMSG(this->getPrefix(), target, message), this);
+		return;
+	}
+	dest = host.getClient(target);
+	if (!dest)
+		return;
+	message = message.at(0) == ':' ? message.substr(1) : message;
+	dest->send_msg(CNF_PRIVMSG(this->getPrefix(), target, message));
 }
