@@ -146,6 +146,19 @@ void Client::pmsg(std::vector<std::string> args) {
 			this->send_msg(ERR_NOSUCHCHANNEL(this->getNickname(), target));
 			return;
 		}
+		if (channel->isNMode()){
+			std::vector<std::string>			nicknames(channel->getNicknames());
+			std::vector<std::string>::iterator	i;
+
+			for (i = nicknames.begin(); i != nicknames.end(); i++)
+				if (*i == this->getNickname())
+					break;
+			if (i == nicknames.end())
+			{
+				this->send_msg(ERR_CANNOTSENDTOCHAN(this->getNickname(), target));
+				return;
+			}
+		}
 		message = message.at(0) == ':' ? message.substr(1) : message;
 		message.append("\r\n");
 		channel->sendMessage(CNF_PRIVMSG(this->getPrefix(), target, message), this);
@@ -200,7 +213,7 @@ void	Client::kick(std::vector<std::string> args)
 		this->send_msg(ERR_NOSUCHCHANNEL(this->getNickname(), channel_name));
 		return;
 	}
-	if (!channel->isAdmin(this))
+	if (!channel->isAdmin(this) && !channel->isOperator(this))
 	{
 		this->send_msg(ERR_CHANOPRIVSNEEDED(this->getNickname(), channel_name));
 		return;
@@ -220,10 +233,62 @@ void	Client::kick(std::vector<std::string> args)
 
 void Client::mode(std::vector<std::string> args)
 {
-	if (args.empty() || (*(args[0].begin()) != '#' && *(args[0].begin()) != '$'))
+	std::string	target;
+	Channel		*channel;
+	int			i = 0;
+	char		modeChar;
+
+	if (args.size() < 2) {
+		this->send_msg(ERR_NEEDMOREPARAMS(this->getNickname(), "MODE"));
 		return;
-	if (host.getChannels(args[0]) != NULL)
-		this->send_msg(ERR_NOCHANMODES(args[0]));
-	else
-		this->send_msg(ERR_USERNOTINCHANNEL(this->getNickname(), args[0]));
+	}
+	if ((*(args[0].begin()) != '#' && *(args[0].begin()) != '$'))
+		return;
+	target = args.at(0);
+	channel = host.getChannels(target);
+	if (!channel) {
+		this->send_msg(ERR_NOSUCHCHANNEL(this->getNickname(), target));
+		return;
+	}
+	if (!channel->isAdmin(this) && !channel->isOperator(this)) {
+		this->send_msg(ERR_CHANOPRIVSNEEDED(this->getNickname(), target));
+		return;
+	}
+
+	modeChar = args[1][i];
+	while (modeChar) {
+		char prevC;
+		if (i > 0)
+			prevC = args[1][i - 1];
+		else
+			prevC = '\0';
+		bool active = prevC == '+';
+		switch (modeChar) {
+
+			case 'o': {
+				Client	*targetUser;
+				targetUser = channel->getClient(args[2]);
+				if (!targetUser)
+					return;
+				if (active) {
+					channel->setOperator(targetUser);
+					channel->sendMessage(RPL_MODE(this->getPrefix(), channel->getName(), (active ? "+n" : "-n"), ""), this);
+				}
+				else {
+					channel->removeOperator(targetUser);
+					channel->sendMessage(RPL_MODE(this->getPrefix(), channel->getName(), (active ? "+n" : "-n"), ""), this);
+				}
+				break;
+			}
+			case 'n': {
+				channel->setNMode(active);
+				channel->sendMessage(RPL_MODE(this->getPrefix(), channel->getName(), (active ? "+n" : "-n"), ""), this);
+				break;
+			}
+			default:
+				break;
+		}
+		i++;
+		modeChar = args[1][i];
+	}
 }

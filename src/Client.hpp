@@ -97,16 +97,19 @@ public:
 	class clientException : public std::exception {
 	};
 
-	Client &operator=(Client const &rhs);
+	Client		&operator=(Client const &rhs);
 
-	Channel	*getChannel() { return _user._channel; }
-	int get_fd() const;
-	std::string getNickname() const;
+	Channel		*getChannel() { return _user._channel; }
+	int 		get_fd() const;
+	std::string	getNickname() const;
 	std::string	getUsername() const;
 	std::string	getAddress() const;
-	std::string getPrefix() const;
-	void send_msg(const std::string &msg);
-	void manage_events(short revents);
+	std::string	getPrefix() const;
+	void 		send_msg(const std::string &msg);
+	void 		manage_events(short revents);
+//	void		setOper();
+//	void		removeOper();
+//	bool		isOper();
 
 	bool is_registered() const;
 	bool is_queue_empty();
