@@ -17,16 +17,21 @@ private:
 	std::string	_host;
 	std::string	_pass;
 	std::string	_buff;
+	std::string	_chan;
 
 	struct sockaddr_in			_server_address;
+	std::vector<std::string>	args;
 
 public:
-	Bot(const std::string &host, const int &port, const std::string &password);
-	~Bot();
+	Bot(const std::string &host, const int &port, const std::string &password, const std::string channel);
+	~ Bot();
 
 	void	run();
-	void	send_cmd(std::string args);
+	void	send_cmd(std::string args) const;
 	void	e_listener();
+	void	read_msg(const std::string &message);
+	void	replay_cmd(const std::string &src, const std::string &cmd, std::vector<std::string> args) const;
+	void	split(std::string &buffer);
 };
 
 #endif //IRCSERV_BOT_HPP

@@ -7,14 +7,15 @@
 
 int	main(int argc, char **argv) {
 	std::string pass;
+	std::string channel;
 
 	try {
 
-		if (argc < 3 || argc > 4) {
-			throw std::runtime_error("Usage: ./ircbot <host> <port> <password>");
+		if (argc < 3 || argc > 5) {
+			throw std::runtime_error("Usage: ./ircbot <host> <port> <password> [channel]");
 		}
-
-		Bot bot(argv[1], std::stoi(argv[2]), argv[3]);
+		argc == 5 ? channel = argv[4] : channel = "#Marvin";
+		Bot bot(argv[1], atoi(argv[2]), argv[3], channel);
 		bot.run();
 		return 0;
 	}
