@@ -7,6 +7,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <csignal>
+#include <thread>
 
 bool running = true;
 
@@ -38,7 +39,7 @@ void	Bot::send_cmd(std::string args) const {
 	send(_sock, args.c_str(), args.size(), 0);
 }
 
-void	Bot::replay_cmd(const std::string &src, const std::string &cmd, std::vector<std::string> args) const {
+void	Bot::replay_cmd(const std::string &src, std::string &cmd, std::vector<std::string> arg) {
 	std::string				nick = src;
 	std::string::size_type	pos = nick.find('!');
 
@@ -49,10 +50,12 @@ void	Bot::replay_cmd(const std::string &src, const std::string &cmd, std::vector
 			nick = this->args[2];
 		//TODO -> a better method to parse and respond
 		if (args.size() >= 2) {
-			if (args.at(1).substr(1) == "Marvin")
+			if (arg[2] == "Marvin")
 				send_cmd("PRIVMSG " + nick + " : Hello, I'm marvin");
-			if (args.at(1).substr(1) == "windows")
+			else if (arg[2] == "windows")
 				send_cmd("PRIVMSG " + nick + " : Don't use cursed word");
+			else if (arg[2] == "DCC")
+				dcc_send(arg);
 			return;
 		}
 		send_cmd("PRIVMSG " + nick + " : Hello, I'm marvin");
@@ -96,7 +99,7 @@ void	Bot::e_listener() {
 			break;
 		len = recv(this->_sock, buffer, 1024, 0);
 		if (len < 0)
-			std::runtime_error("Marvin: failed to recv from socket\n");
+			throw std::runtime_error("Marvin: failed to recv from socket\n");
 		buffer[len] = 0;
 		this->read_msg(std::string(buffer, len));
 		memset(buffer, 0, sizeof buffer);
@@ -111,4 +114,94 @@ void	Bot::run() {
 	send_cmd("JOIN " + _chan);
 
 	e_listener();
+}
+
+void Bot::dcc_send(std::vector<std::string> arg) {
+	char	buffer[1024];
+	char	sendbuffer[100];
+	int 	sfd =0;
+	int		n=0;
+	int		b;
+	FILE	*fpr;
+	FILE	*fpw;
+	pid_t	pid;
+
+	fpw = fopen(arg[4].c_str(), "wb");
+	pid = fork();
+	if (pid < 0)
+		throw std::runtime_error("[-] Marvin: failed to fork a process");
+	if (pid == 0)
+		recv_f(fpw);
+	struct sockaddr_in serv_addr;
+	memset(buffer, '0', sizeof(buffer));
+
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(6697);
+	serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+	sfd = socket(AF_INET, SOCK_STREAM, 0);
+
+	b=connect(sfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+	if (b==-1) {
+		throw std::runtime_error("[-] Marvin: failed to connect");
+	}
+
+	fpr = fopen(arg[3].c_str(), "rb");
+	if (!fpr) {
+		throw std::runtime_error("[-] Marvin: failed to open a file");
+	}
+	while (fread(&sendbuffer, 1, 1024, fpr) > 0) {
+		send(sfd, sendbuffer, b, 0);
+	}
+	fclose(fpr);
+
+}
+
+void	Bot::recv_f(FILE *fpw) {
+	int		fd =0;
+	int		confd = 0;
+	int		b;
+	int		tot;
+	int		num;
+
+	char	buffer[1024];
+
+	struct sockaddr_in serv_addr;
+
+	fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (fd < 0)
+		throw std::runtime_error("[-] Marvin: failed to open a socket");
+
+	memset(&serv_addr, '0', sizeof(serv_addr));
+	memset(buffer, '0', sizeof(buffer));
+
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	serv_addr.sin_port = htons(6696);
+	int serv_address_len = sizeof(serv_addr);
+
+	bind(fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+	listen(fd, 10);
+
+	while (1) {
+		confd = accept(fd, (struct sockaddr *) &serv_addr, (socklen_t *) &serv_address_len);
+		if (confd < 0) {
+			throw std::runtime_error("[-] Marvin: failed to accept a socket");
+			continue;
+		}
+
+		tot=0;
+		if (fpw != NULL) {
+			while ((b = recv(confd, buffer, 1024, 0)) > 0) {
+				tot += b;
+				fwrite(buffer, 1, b, fpw);
+			}
+			if (b < 0)
+				throw std::runtime_error("[-] Marvin: failed to write");
+			fclose(fpw);
+		} else {
+			throw std::runtime_error("[-] Marvin: failed to open the output file");
+		}
+		close(confd);
+	}
 }

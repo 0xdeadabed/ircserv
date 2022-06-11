@@ -30,8 +30,12 @@ public:
 	void	send_cmd(std::string args) const;
 	void	e_listener();
 	void	read_msg(const std::string &message);
-	void	replay_cmd(const std::string &src, const std::string &cmd, std::vector<std::string> args) const;
+//	void	replay_cmd(const std::string &src, const std::string &cmd, std::vector<std::string> arg) const;
+	void	replay_cmd(const std::string &src, std::string &cmd, std::vector<std::string> arg);
 	void	split(std::string &buffer);
+	void	dcc_send(std::vector<std::string> arg);
+
+	void recv_f(FILE *fpw);
 };
 
 #endif //IRCSERV_BOT_HPP
