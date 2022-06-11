@@ -43,6 +43,7 @@ public:
 	size_t						getClientsNumber();
 	bool						isMaxMode();
 	void						setPassword(std::string k) { this->_k = k; };
+    void                        cleanChannel();
 
 private:
 	std::string				_name;

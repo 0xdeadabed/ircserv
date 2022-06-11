@@ -60,9 +60,9 @@ Server::~Server() {
 	close(listen_fd.fd);
 //	std::cout << "close: " << c << std::endl;
 	//TODO: fix the allocation problem, doesn't free well
-//	std::vector<Channel *>::iterator itc;
-//	for ( itc = _channels.begin(); itc != _channels.end(); itc++)
-//		delete *itc;
+	std::vector<Channel *>::iterator itc;
+	for ( itc = _channels.begin(); itc != _channels.end(); itc++)
+		delete *itc;
 //todo
 }
 

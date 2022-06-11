@@ -3,6 +3,7 @@
 //
 
 #include <string>
+#include <cstdlib>
 #include "Client.hpp"
 #include "messages.hpp"
 
@@ -80,6 +81,7 @@ void Client::join(std::vector<std::string> args) {
 
 void Client::quit() {
 	_quit = true;
+
 	if (this->getChannel() != NULL)
 		this->leaveChannel();
 	std::cout << "QUIT" << std::endl;
@@ -285,9 +287,9 @@ void Client::mode(std::vector<std::string> args)
 				break;
 			}
 			case 'l': {
-				size_t	size;
+				int	size;
 				if (active && args.size() == 3)
-					size = std::stol(args[2]);
+					size = atoi(args[2].c_str());
 				else
 					size = 0;
 				channel->setMaxSize(active, size);

@@ -17,6 +17,7 @@ Channel::Channel(Channel const &inst) {
 }
 
 Channel::~Channel() {
+    _members.clear();
 }
 
 Channel &Channel::operator=(Channel const &rhs) {
@@ -131,4 +132,8 @@ size_t	Channel::getClientsNumber() {
 
 bool	Channel::isMaxMode() {
 	return this->_l_active;
+}
+
+void Channel::cleanChannel() {
+    _members.clear();
 }

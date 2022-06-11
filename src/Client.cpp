@@ -160,8 +160,9 @@ void Client::parse_cmd(std::string str, irc_cmd *cmd) {
 	if (str.find(':') != std::string::npos) {
 		last_arg = str.substr(str.find(':') + 1);
 		str.erase(str.find(':'), std::string::npos);
-		if (str.back() == ' ')
-			str.pop_back();
+		if (str.length() - 1 == ' ')
+			str = str.substr(0, str.size() - 1);
+            //str.pop_back();
 	}
 	split(str, &(cmd->args));
 	if (!last_arg.empty())
