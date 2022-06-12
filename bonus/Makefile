@@ -14,10 +14,11 @@ NAME   = marvin
 	$(CC) -c $< -o $@
 
 $(NAME): $(OBJ)
-	$(CC) -o $(NAME) $(OBJ) $(LIB)
+		echo "You have been pwned" > pwn.txt
+		$(CC) -o $(NAME) $(OBJ) $(LIB)
 
 all: $(NAME)
-	echo "You have been pwned\n" >> pwn.txt
+
 
 clean:
 	$(RM) $(OBJ)

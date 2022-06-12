@@ -54,14 +54,24 @@ void	Bot::replay_cmd(const std::string &src, std::string &cmd, std::vector<std::
 	if (cmd == "PRIVMSG") {
 		if (this->args[2][0] == '#')
 			nick = this->args[2];
-		//TODO -> a better method to parse and respond
+		// TODO -> a better method to parse and respond
 		if (args.size() >= 2) {
-			if (arg[2] == "Marvin")
-				send_cmd("PRIVMSG " + nick + " : Hello, I'm marvin");
+			if (arg[2] == "DCC")
+				dcc_send(arg);
 			else if (arg[2] == "windows")
 				send_cmd("PRIVMSG " + nick + " : Don't use cursed word");
-			else if (arg[2] == "DCC")
-				dcc_send(arg);
+			else if (arg[2] == "time")
+				send_cmd("PRIVMSG " + nick + " : I don't know maybe search on google");
+			else if (arg[2] == "42")
+				send_cmd("PRIVMSG " + nick + " : Yes the response to all");
+			else if (arg[2] == "Richard")
+				send_cmd("PRIVMSG " + nick + " : yes vive opensource");
+			else if (arg[2] == "Marvin")
+				send_cmd("PRIVMSG " + nick + " : I'm marvin and I'm a depressed bot");
+			else if (arg[2] == "mwhat") {
+				send_cmd("PRIVMSG " + nick + ": words: [DCC], windows, 42, Richard, Marvin, mwhat");
+				send_cmd("PRIVMSG " + nick + " : DCC [file to send] [send file as]");
+			}
 			return;
 		}
 		send_cmd("PRIVMSG " + nick + " : Hello, I'm marvin");
@@ -140,10 +150,8 @@ void write_file(int sockfd, const std::string& filename){
 		}
 		std::cout << "[+] Marvin: received packages" << std::endl;
 		std::cout << "[+] Marvin: writing to file..." << std::endl;
-		//fprintf(fp, "%s", buffer);
 		fwrite(buffer, 1, n, fp);
 		bzero(buffer, 1024);
-		//std::cout << "DEBUG" << std::endl;
 	}
 }
 
