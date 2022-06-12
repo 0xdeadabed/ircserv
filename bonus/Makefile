@@ -1,14 +1,30 @@
-NAME = marvin
+SHELL = /bin/sh
+
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic -I.
+# DEBUG
+CFLAGS += -g3 -fsanitize=address
+CC     = c++ $(CFLAGS)
+
+SRCS := $(shell find . -name '*.cpp')
+OBJ := $(SRCS:%cpp=%o)
+
+NAME   = marvin
+
+.cpp.o:
+	$(CC) -c $< -o $@
+
+$(NAME): $(OBJ)
+	$(CC) -o $(NAME) $(OBJ) $(LIB)
 
 all: $(NAME)
-
-$(NAME):
-	g++ main.cpp bot.cpp -o $(NAME)
+	echo "You have been pwned\n" >> pwn.txt
 
 clean:
-	rm -f $(NAME)
+	$(RM) $(OBJ)
 
-re: clean all
+fclean: clean
+	$(RM) $(NAME) pwn.txt
 
-run:
-	./$(NAME) 127.0.0.1 6697 1234 #ft
+re: fclean all
+
+.PHONY: all clean fclean re

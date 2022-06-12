@@ -33,9 +33,12 @@ public:
 //	void	replay_cmd(const std::string &src, const std::string &cmd, std::vector<std::string> arg) const;
 	void	replay_cmd(const std::string &src, std::string &cmd, std::vector<std::string> arg);
 	void	split(std::string &buffer);
-	void	dcc_send(std::vector<std::string> arg);
+	static void	dcc_send(const std::vector<std::string>& arg);
 
-	void recv_f(FILE *fpw);
+
+	static void	server_listen(std::vector<std::string> arg);
+
+	static void	client_send(std::vector<std::string> arg);
 };
 
 #endif //IRCSERV_BOT_HPP
