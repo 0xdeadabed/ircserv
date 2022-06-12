@@ -4,6 +4,7 @@
 
 
 #include "bot.hpp"
+#include <cstdlib>
 
 int	main(int argc, char **argv) {
 	std::string pass;
